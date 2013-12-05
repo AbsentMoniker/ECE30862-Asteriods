@@ -29,6 +29,7 @@ public abstract class MovingObjectModel implements Updatable {
 		// seconds is time since last valid update
 		double seconds = (System.nanoTime() - lastUpdate) / 1e9;
 		lastUpdate = System.nanoTime();
+//		System.out.println(seconds);
 		
 		// update velocity and then position for both X, Y
 		// bounds check and "warp" position if necessary
@@ -43,6 +44,7 @@ public abstract class MovingObjectModel implements Updatable {
 		
 		// update rotational position
 		rotPos += rotVel * seconds;
+		rotPos %= 2 * Math.PI;
 	}
 	
 	public final double[] getPosition() {
