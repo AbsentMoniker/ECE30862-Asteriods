@@ -28,6 +28,7 @@ public class Asteroids{
 			JFrame window = screen.getFullScreenWindow();
 			MyCanvas canvas = new MyCanvas();
 			window.getContentPane().add(canvas);
+			canvas.setSize(window.getSize());
 			canvas.createBufferStrategy(2);
 			window.revalidate();
 			while (true){
