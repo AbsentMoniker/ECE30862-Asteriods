@@ -1,11 +1,14 @@
 package Game;
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,13 +26,14 @@ public class Asteroids{
 			
 			screen.setFullScreen(displayMode);
 			JFrame window = screen.getFullScreenWindow();
-			Canvas canvas = new Canvas();
+			MyCanvas canvas = new MyCanvas();
 			window.getContentPane().add(canvas);
+			canvas.createBufferStrategy(2);
 			window.revalidate();
 			while (true){
 				canvas.update();
 				try{
-					Thread.sleep(50);
+					Thread.sleep(20);
 				}catch (InterruptedException ex){}
 			}
 		}finally{
@@ -38,25 +42,43 @@ public class Asteroids{
 		
 	}
 	
-	private static class Canvas extends JPanel{
+	private static class MyCanvas extends Canvas{
 		private Player player;
 		
-		public Canvas(){
+		public MyCanvas(){
 			player = new Player(100,100);
-			this.setBackground(Color.BLACK);
+			setBackground(Color.BLACK);
+			setIgnoreRepaint(true);
 		}
 		
 		
 		public void update(){
 			player.update();
-			repaint();
+			Graphics2D g = (Graphics2D)getBufferStrategy().getDrawGraphics();
+			
+			//Clear screen
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, getWidth(), getHeight());
+			
+			paintItems(g);
+			getBufferStrategy().show();
+			Toolkit.getDefaultToolkit().sync();
+			g.dispose();
+			//repaint();
 		}
 		
-		@Override
-		public void paintComponent(Graphics g){
-			super.paintComponent(g);
+		public void paintItems(Graphics2D g){
 			player.paint(g);
-			
+		}
+		
+		
+		@Override
+		public void paint(Graphics g){
+			super.paint(g);
+			Graphics2D g2 = (Graphics2D)g.create();
+			player.paint(g2);
+			g2.dispose();
+			g.dispose();
 		}
 	}
 	
