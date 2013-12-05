@@ -34,12 +34,12 @@ public class Player implements Updatable {
 			angle -= 360;
 	}
 	
-	public void paint(Graphics2D g){
+	public void paint(Graphics2D g, int width, int height){
 		g.setColor(Color.white);
 		GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
 		double [] pos = model.getPosition();
-		//pos[0]*= 13;
-		//pos[1]*=
+		pos[0]*= width/100;
+		pos[1]*= height/100;
 		shape.moveTo(pos[0], pos[1]+20);
 		shape.lineTo(pos[0]+10, pos[1]-20);
 		shape.lineTo(pos[0]-10, pos[1]-20);

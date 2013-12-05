@@ -48,7 +48,7 @@ public abstract class MovingObjectModel implements Updatable {
 	}
 	
 	public final double[] getPosition() {
-		return pos;
+		return pos.clone();
 	}
 	
 	public final double getOrientation() {
