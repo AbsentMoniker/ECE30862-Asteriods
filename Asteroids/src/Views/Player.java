@@ -21,7 +21,7 @@ public class Player implements Updatable {
 		x = startX;
 		y = startY;
 		angle = 0;
-		model = new PlayerModel();
+		model = new PlayerModel(0);
 	}
 	@Override
 	public void update() {
@@ -37,12 +37,15 @@ public class Player implements Updatable {
 	public void paint(Graphics2D g){
 		g.setColor(Color.white);
 		GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-		shape.moveTo(x, y+20);
-		shape.lineTo(x+10, y-20);
-		shape.lineTo(x-10, y-20);
+		double [] pos = model.getPosition();
+		//pos[0]*= 13;
+		//pos[1]*=
+		shape.moveTo(pos[0], pos[1]+20);
+		shape.lineTo(pos[0]+10, pos[1]-20);
+		shape.lineTo(pos[0]-10, pos[1]-20);
 		shape.closePath();
 		AffineTransform at = new AffineTransform();
-		at.rotate(Math.toRadians(angle),x,y);
+		at.rotate(model.getOrientation(),pos[0],pos[1]);
 		shape.transform(at);
 		g.draw(shape);
 	}
