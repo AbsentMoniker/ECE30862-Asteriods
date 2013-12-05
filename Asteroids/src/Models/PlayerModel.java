@@ -3,9 +3,9 @@ package Models;
 public class PlayerModel extends MovingObjectModel implements Updatable {
 	// CONSTANTS
 	// player acceleration constant, in points/s^2
-	private final double shipAcceleration = 5;
+	private final double shipAcceleration = 10;
 	// player rotation constant, in rad/s
-	private final double shipRotationSpeed = 0.3;
+	private final double shipRotationSpeed = 2.5;
 	
 	// VARIABLES
 	// which player this is (0 or 1)
@@ -24,7 +24,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	@Override
 	public void update() {
 		if (keyChecker.getPlayerAccelerating(player)) {
-			acc[0] = Math.sin(rotPos) * shipAcceleration;
+			acc[0] = -1 * Math.sin(rotPos) * shipAcceleration;
 			acc[1] = Math.cos(rotPos) * shipAcceleration;
 		} else {
 			acc[0] = acc[1] = 0;
