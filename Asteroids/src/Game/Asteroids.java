@@ -69,7 +69,7 @@ public class Asteroids{
 		}
 		
 		public void paintItems(Graphics2D g){
-			player.paint(g);
+			player.paint(g, getWidth(), getHeight());
 		}
 		
 		
@@ -77,7 +77,7 @@ public class Asteroids{
 		public void paint(Graphics g){
 			super.paint(g);
 			Graphics2D g2 = (Graphics2D)g.create();
-			player.paint(g2);
+			player.paint(g2, getWidth(), getHeight());
 			g2.dispose();
 			g.dispose();
 		}
