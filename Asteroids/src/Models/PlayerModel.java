@@ -1,39 +1,60 @@
 package Models;
 
-public class PlayerModel implements Updatable {
-	// X and Y positions in points (pos[0] is X, pos[1] is Y)
-	// imaginary FOV is 100x100 points
-	private float pos[] = new float[2];
-	// X and Y velocities in points/sec (vel[0] is X, vel[1] is Y)
-	private float vel[] = new float[2];
-	// controls whether we should be counting time (e.g., false when paused)
-	private boolean playing = false;
-	// nanosecond time when model was last updated
-	private long lastUpdate = 0;
+public class PlayerModel extends MovingObjectModel implements Updatable {
+	// CONSTANTS
+	// player acceleration constant, in points/s^2
+	private final double shipAcceleration = 5;
+	// player rotation constant, in rad/s
+	private final double shipRotationSpeed = 0.3;
 	
-	private KeyChecker keyChecker;
+	// VARIABLES
+	// which player this is (0 or 1)
+	private int player = 0;
+	// our keychecker
+	KeyChecker keyChecker;
+	// how long it's been since a print was issued
+	private long lastPrint = 0;
 	
-	public PlayerModel() {
+	public PlayerModel(int playerNum) {
+		System.out.println("Player model " + playerNum + " instantiated");
+		player = playerNum;
 		keyChecker = new KeyChecker();
 	}
 	
-	public void pauseModel() {
-		playing = false;
-	}
-	
+	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-		if (playing == false) {
-			// we weren't updating, now we are; get the time and return
-			playing = true;
-			lastUpdate = System.nanoTime();
-			return;
+		if (keyChecker.getPlayerAccelerating(player)) {
+			acc[0] = Math.sin(rotPos) * shipAcceleration;
+			acc[1] = Math.cos(rotPos) * shipAcceleration;
+		} else {
+			acc[0] = acc[1] = 0;
 		}
 		
-		// we've already been updating for some time
-		// seconds is time since last valid update
-		double seconds = (System.nanoTime() - lastUpdate) / 1e9;
+		if (keyChecker.getPlayerDirection(player) == 'l') {
+			rotVel = -shipRotationSpeed;
+		} else if (keyChecker.getPlayerDirection(player) == 'r') {
+			rotVel = shipRotationSpeed;
+		} else {
+			rotVel = 0;
+		}
 		
+		if (keyChecker.getPlayerShooting(player)) {
+			// TODO spawn bullets
+		}
+		
+		super.update();
+		
+		if (System.nanoTime() - lastPrint > 1e9) {
+			System.out.println(this);
+			lastPrint = System.nanoTime();
+		}
 	}
-
+	
+	@Override
+	public String toString() {
+		String retString;
+		retString = String.format("Player #%d\n", player);
+		retString += super.toString();
+		return retString;
+	}
 }

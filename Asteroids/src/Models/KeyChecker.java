@@ -14,7 +14,6 @@ public class KeyChecker {
 	private boolean escapePressed;
 	
 	public KeyChecker() {
-		System.out.println("Hello");
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent ke) {
@@ -22,7 +21,6 @@ public class KeyChecker {
                     switch (ke.getID()) {
                     // if this event was caused by a key press
                     case KeyEvent.KEY_PRESSED:
-                    	System.out.println("Keypressed!");
                     	switch (ke.getKeyCode()) {
                     	case KeyEvent.VK_LEFT:
                     		playerDir[0] = 'l';
