@@ -130,11 +130,40 @@ public class Asteroids{
 		}
 		
 		public void paintItems(Graphics2D g){
+			if (gravExists && gravVisible)
+				drawGravObject(g);
 			player1.paint(g, getWidth(), getHeight());
 			g.setFont(new Font("Arial",Font.PLAIN,30));
 			g.drawString(""+score, 40,40);
 		}
-		public void paintPauseScreen(Graphics2D g){
+		private void drawGravObject(Graphics2D g){
+			g.setColor(new Color(50,50,50));
+			g.fillOval(getWidth()/2-70, getHeight()/2-62, 140, 124);
+			g.setColor(new Color(100,100,100));
+			g.fillOval(getWidth()/2-65, getHeight()/2-57, 130, 114);
+			g.setColor(new Color(150,150,150));
+			g.fillOval(getWidth()/2-60, getHeight()/2-52, 120, 104);
+			g.setColor(new Color(200,200,200));
+			g.fillOval(getWidth()/2-55, getHeight()/2-47, 110, 94);
+			g.setColor(new Color(250,250,250));
+			g.fillOval(getWidth()/2-50, getHeight()/2-42, 100, 84);
+			g.setColor(new Color(200,200,200));
+			g.fillOval(getWidth()/2-45, getHeight()/2-37, 90, 74);
+			g.setColor(new Color(150,150,150));
+			g.fillOval(getWidth()/2-40, getHeight()/2-32, 80, 64);
+			g.setColor(new Color(100,100,100));
+			g.fillOval(getWidth()/2-35, getHeight()/2-27, 70, 54);
+			g.setColor(new Color(50,50,50));
+			g.fillOval(getWidth()/2-30, getHeight()/2-22, 60, 44);
+			g.setColor(Color.BLACK);
+			g.fillOval(getWidth()/2-25, getHeight()/2-17, 50, 34);
+			
+			
+			
+			
+			
+		}
+		private void paintPauseScreen(Graphics2D g){
 			g.setFont(pauseFont);
 			if (fm == null){
 				initClickAreas();
@@ -201,7 +230,7 @@ public class Asteroids{
 				g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 500);
 				
 				//Starting Level
-				current = "Starting Level";
+				current = "Starting Level: "+startingLevel;
 				optionsTextAreas[5] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 575-lineHeight/2, fm.stringWidth(current),lineHeight);
 				if (optionsTextAreas[5].contains(MouseInfo.getPointerInfo().getLocation()))
 					g.setColor(Color.RED);
@@ -254,7 +283,7 @@ public class Asteroids{
 				if (inOptions){
 					if (optionsTextAreas[0].contains(e.getLocationOnScreen())){//Grav Exists
 						gravExists = !gravExists;
-					}else if (optionsTextAreas[1].contains(e.getLocationOnScreen())){//Grav Visible
+					}else if (optionsTextAreas[1].contains(e.getLocationOnScreen()) && gravExists){//Grav Visible
 						gravVisible = !gravVisible;
 					}else if (optionsTextAreas[2].contains(e.getLocationOnScreen())){//Unlimited Lives
 						unlimitedLives = !unlimitedLives;
