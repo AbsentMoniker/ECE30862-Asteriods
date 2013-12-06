@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Paint;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -16,10 +17,18 @@ import javax.swing.JPanel;
 import Views.Player;
 
 public class Asteroids{
+	private Player player1;
 	
+	private int score = 0;
+	
+	public Asteroids(){
+		player1 = new Player(100,100);
+	}
 	public static void main(String [] argv){
-		Asteroids game = new Asteroids();
-		
+		new Asteroids().start();
+	}
+	
+	public void start(){
 		DisplayMode displayMode = new DisplayMode(100,100,16,75);
 		ScreenManager screen = new ScreenManager();
 		try{
@@ -43,18 +52,17 @@ public class Asteroids{
 		
 	}
 	
-	private static class MyCanvas extends Canvas{
-		private Player player;
+	private class MyCanvas extends Canvas{
+		
 		
 		public MyCanvas(){
-			player = new Player(100,100);
 			setBackground(Color.BLACK);
 			setIgnoreRepaint(true);
 		}
 		
 		
 		public void update(){
-			player.update();
+			player1.update();
 			Graphics2D g = (Graphics2D)getBufferStrategy().getDrawGraphics();
 			
 			//Clear screen
@@ -69,7 +77,9 @@ public class Asteroids{
 		}
 		
 		public void paintItems(Graphics2D g){
-			player.paint(g, getWidth(), getHeight());
+			player1.paint(g, getWidth(), getHeight());
+			g.setFont(new Font("Arial",Font.PLAIN,30));
+			g.drawString(""+score, 40,40);
 		}
 		
 		
@@ -77,7 +87,8 @@ public class Asteroids{
 		public void paint(Graphics g){
 			super.paint(g);
 			Graphics2D g2 = (Graphics2D)g.create();
-			player.paint(g2, getWidth(), getHeight());
+			
+			player1.paint(g2, getWidth(), getHeight());
 			g2.dispose();
 			g.dispose();
 		}
