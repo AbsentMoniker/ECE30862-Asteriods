@@ -60,4 +60,10 @@ public abstract class BaseView implements Updatable{
 	public int getLives() {
 		return model.getLives();
 	}
+	public double getDist(){
+		return model.getDist();
+	}
+	public void setDist(double dist){
+		model.setDist(dist);
+	}
 }

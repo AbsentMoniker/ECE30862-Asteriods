@@ -102,7 +102,12 @@ public abstract class MovingObjectModel implements Updatable {
 	public int getLives() {
 		return lives;
 	}
-	
+	public double getDist(){
+		return dist;
+	}
+	public void setDist(double newDist){
+		dist = newDist;
+	}
 	public boolean decrementLives() {
 		return true;
 	}

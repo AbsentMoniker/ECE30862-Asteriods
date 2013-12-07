@@ -60,13 +60,15 @@ public class Asteroids{
 	private int score1 = 0;
 	private int score2 = 0;
 	private static boolean paused = false;
-	private boolean inOptions = false;
+
 	private int level = 1;
 
 	private KeyChecker keyChecker;
 	
 	private boolean inMainMenu = true;
 	private boolean gameLoaded = false;
+	private boolean inOptions = false;
+	private boolean inHighScores = false;
 	
 	//options
 	private boolean gravExists = false;
@@ -75,6 +77,9 @@ public class Asteroids{
 	private int numAsteroids = 1;
 	private int startingLevel = 1;
 	private boolean isSinglePlayer = true;
+	
+	private ArrayList<Integer> highScores;
+	private ArrayList<String> highScoreNames;
 	
 	private void gameInit(){
 		score1 = 0;
@@ -159,8 +164,9 @@ public class Asteroids{
 				newVY = file.readDouble();
 				newVAngle = file.readDouble();
 				Color newColor = new Color(file.readInt());
-				//TODO: add distance remaining to travel
-				bullets.add(new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor));
+				Bullet newBullet = new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor);
+				newBullet.setDist(file.readDouble());
+				bullets.add(newBullet);
 			}
 			status = file.readInt();
 			for (int i = 0; i < status; i++){
@@ -254,6 +260,7 @@ public class Asteroids{
 				file.writeDouble(bullet.getVY());
 				file.writeDouble(bullet.getVAngle());
 				file.writeInt(bullet.getColor().getRGB());
+				file.writeDouble(bullet.getDist());
 			}
 			file.writeInt(asteroids.size());
 			for (Asteroid asteroid:asteroids){
@@ -296,7 +303,7 @@ public class Asteroids{
 		return true;
 	}
 	public void exit(){
-		//TODO: Write new high scores
+		saveHighScores();
 		System.exit(0);
 	}
 	public void initAsteroids(){
@@ -329,7 +336,48 @@ public class Asteroids{
 	public static void main(String [] argv){
 		new Asteroids().start();
 	}
-	
+	public void loadHighScores(){
+		highScores = new ArrayList<Integer>();
+		highScoreNames = new ArrayList<String>();
+		DataInputStream file;
+		try{
+			file = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(HIGHSCOREFILE))));
+		}catch (FileNotFoundException ex){
+			return;
+		}
+		
+		try{
+			int numScores = file.readInt();
+			for (int i = 0; i < numScores; i++){
+				highScoreNames.add(file.readUTF());
+				highScores.add(file.readInt());
+			}
+			file.close();
+		}catch (IOException ex){
+			
+		}
+	}
+	public void saveHighScores(){
+		DataOutputStream file;
+		try{
+			file = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(HIGHSCOREFILE),false)));
+		}catch (FileNotFoundException ex){
+			return;
+		}
+		try{
+			file.writeInt(highScores.size());
+			for (int i = 0; i < highScores.size(); i++){
+				file.writeUTF(highScoreNames.get(i));
+				file.writeInt(highScores.get(i));
+			}
+			file.close();
+		}catch (IOException ex){
+			
+		}
+	}
+	public void addHighScore(){
+		
+	}
 	public void start(){
 		DisplayMode displayMode = new DisplayMode(100,100,16,75);
 		ScreenManager screen = new ScreenManager();
@@ -343,6 +391,8 @@ public class Asteroids{
 			canvas.createBufferStrategy(2);
 			canvas.initClickAreas();
 			window.revalidate();
+			
+			loadHighScores();
 			while (true){
 				//Menu Loop
 				while (inMainMenu){
