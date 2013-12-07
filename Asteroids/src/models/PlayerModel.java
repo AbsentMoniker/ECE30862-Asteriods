@@ -3,7 +3,7 @@ package models;
 public class PlayerModel extends MovingObjectModel implements Updatable {
 	// CONSTANTS
 	// player acceleration constant, in points/s^2
-	private final double shipAcceleration = 10;
+	private final double shipAcceleration = 80;
 	// player rotation constant, in rad/s
 	private final double shipRotationSpeed = 2.5;
 	

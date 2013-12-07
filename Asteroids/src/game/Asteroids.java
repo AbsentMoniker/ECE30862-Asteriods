@@ -28,6 +28,9 @@ import models.MovingObjectModel;
 
 
 public class Asteroids{
+	public static int screenWidth;
+	public static int screenHeight;
+	
 	//Game Objects
 	private Player player1;
 	private Player player2;
@@ -118,6 +121,18 @@ public class Asteroids{
 		if (paused)
 			MovingObjectModel.setPlaying(false);
 	}
+	public static int getScreenWidth(){
+		return screenWidth;
+	}
+	public static int getScreenHeight(){
+		return screenHeight;
+	}
+	public static int []getScreenDims(){
+		int []dims = new int[2];
+		dims[0] = screenWidth;
+		dims[1] = screenHeight;
+		return dims;
+	}
 	private class MyCanvas extends Canvas implements MouseListener{
 		private Font pauseFont;
 		private Font menuFont;
@@ -141,6 +156,9 @@ public class Asteroids{
 			optionsTextAreas = new Rectangle[10];
 		}
 		private void initClickAreas(){
+			screenWidth = getWidth();
+			screenHeight = getHeight();
+			
 			fm = getBufferStrategy().getDrawGraphics().getFontMetrics(pauseFont);
 			int lineHeight = fm.getAscent()+fm.getDescent();
 			//Main Menu

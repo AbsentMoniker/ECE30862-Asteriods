@@ -1,5 +1,7 @@
 package models;
 
+import game.Asteroids;
+
 public abstract class MovingObjectModel implements Updatable {
     // X and Y positions in points (pos[0] is X, pos[1] is Y)
 	// imaginary FOV is 100x100 points
@@ -16,7 +18,7 @@ public abstract class MovingObjectModel implements Updatable {
 	static protected boolean playing = false;
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
-	
+
 	public MovingObjectModel(){
 		pos[0] = 50;
 		pos[1] = 50;
@@ -40,9 +42,9 @@ public abstract class MovingObjectModel implements Updatable {
 			vel[i] += acc[i] * seconds;
 			pos[i] += vel[i] * seconds;
 			if (pos[i] < 0)
-				pos[i] = pos[i] + 100;
-			else if (pos[i] > 100)
-				pos[i] = pos[i] - 100;
+				pos[i] = pos[i] + Asteroids.getScreenDims()[i];
+			else if (pos[i] > Asteroids.getScreenDims()[i])
+				pos[i] = pos[i] - Asteroids.getScreenDims()[i];
 		}
 		
 		// update rotational position
