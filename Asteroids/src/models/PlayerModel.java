@@ -61,12 +61,15 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 				lastBullet = System.nanoTime();
 			}
 		}
-		// TODO prevent instaburst
+
 		if (System.nanoTime() - lastBullet > 0.2e9) {  // .2 seconds
 			burstLength = 0;
 		}
 		
 		super.update();
+		
+		// add slowdown effect
+		
 		
 		if (System.nanoTime() - lastPrint > 1e9) {
 			//System.out.println(this);

@@ -19,6 +19,8 @@ public abstract class MovingObjectModel implements Updatable {
 	protected long lastUpdate = 0;
     // circle radius for hit detection
 	protected double hitRad = 0;
+	// distance object has traveled in points
+	protected double dist = 0;
 	// lives
 	protected int lives = 0;
 
@@ -64,6 +66,9 @@ public abstract class MovingObjectModel implements Updatable {
 		// update rotational position
 		rotPos += rotVel * seconds;
 		rotPos %= 2 * Math.PI;
+		
+		// update distance traveled
+		dist += Math.sqrt( Math.pow(vel[0] * seconds, 2) + Math.pow(vel[1] * seconds, 2) );
 	}
 	
 	public final boolean collidesWith(MovingObjectModel obj) {

@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -379,19 +380,26 @@ public class Asteroids{
 			rogueSpaceship.update();
 		if (alienShip != null)
 			alienShip.update();
-		for (Bullet bullet:bullets)
-			bullet.update();
+		
+		for (Iterator<Bullet> it = bullets.iterator(); it.hasNext();) {
+			Bullet b = it.next();
+			b.update();
+			if (b.shouldDeconstruct()) {
+				it.remove();
+			}
+		}
+
 		for (Asteroid asteroid:asteroids) {
 			MovingObjectModel astModel = asteroid.model;
 			MovingObjectModel player1Model = player1.model;
 			if (astModel.collidesWith(player1Model)) {
-				// player 1 has hit an asteroid
+				// TODO player 1 has hit an asteroid
 				//System.out.println("P1 hit an asteroid");
 			}
 			if (player2 != null) {
 				MovingObjectModel player2Model = player2.model;
 				if (astModel.collidesWith(player2Model)) {
-					// player 2 has hit an asteroid
+					// TODO player 2 has hit an asteroid
 				}
 			}
 		}
@@ -399,12 +407,41 @@ public class Asteroids{
 		// spawn bullet for P1
 		PlayerModel p1Model = (PlayerModel)player1.model;
 		if (p1Model.firesBullet()) {
-			System.out.println("Trying to fire bullet");
 			Bullet newBullet;
 			double[] bPos = p1Model.bulletPos();
 			double[] bVel = p1Model.bulletVel();
 			newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
 			bullets.add(newBullet);
+		}
+		
+		if (player2 != null) {
+			// spawn bullet for P1
+			PlayerModel p2Model = (PlayerModel)player2.model;
+			if (p2Model.firesBullet()) {
+				Bullet newBullet;
+				double[] bPos = p2Model.bulletPos();
+				double[] bVel = p2Model.bulletVel();
+				newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
+				bullets.add(newBullet);
+			}
+		}
+		
+		// check collisions between bullets and, uhm, everything
+		for (Iterator<Bullet> bIt = bullets.iterator(); bIt.hasNext();) {
+			// check against asteroids
+			Bullet b = bIt.next();
+			MovingObjectModel bModel = b.model;
+			for (Iterator<Asteroid> aIt = asteroids.iterator(); aIt.hasNext();) {
+				Asteroid ast = aIt.next();
+				MovingObjectModel astModel = ast.model;
+				if (astModel.collidesWith(bModel)) {
+					// TODO spawn three small asteroids if this one was big
+					bIt.remove();
+					aIt.remove();
+				}
+			}
+			
+			
 		}
 	}
 	
