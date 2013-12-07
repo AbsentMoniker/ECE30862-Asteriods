@@ -63,6 +63,8 @@ public class Asteroids{
 	private KeyChecker keyChecker;
 	
 	private boolean inMainMenu = true;
+	private boolean gameLoaded = false;
+	
 	//options
 	private boolean gravExists = false;
 	private boolean gravVisible = false;
@@ -93,7 +95,7 @@ public class Asteroids{
 			}
 		}
 		rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
-		alienShip = new AlienShip(600,600,0,0,0,0);
+		alienShip = new AlienShip(600,600,0,0,0,0,3);
 		initAsteroids();
 		paused = false;	
 	}
@@ -336,7 +338,10 @@ public class Asteroids{
 					canvas.update();
 				}
 				//Game loop
-				gameInit();
+				if (gameLoaded)
+					gameLoaded = false;
+				else
+					gameInit();
 				while (!inMainMenu){
 					if (paused){
 					
@@ -741,13 +746,18 @@ public class Asteroids{
 				if (mainMenuTextAreas[0].contains(e.getLocationOnScreen())){//Play
 					inMainMenu = false;
 				}else if (mainMenuTextAreas[1].contains(e.getLocationOnScreen())){//Load
-					final JFileChooser fc = new JFileChooser();
+					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
 					int returnVal = fc.showOpenDialog(this);
 					if (returnVal == JFileChooser.APPROVE_OPTION){
 						File openFile = fc.getSelectedFile();
-						gameInitFromFile(openFile);
+						boolean result = gameInitFromFile(openFile);
+						if (result){
+							gameLoaded = true;
+							inMainMenu = false;
+						}
 					}
+					
 				}else if (mainMenuTextAreas[2].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (mainMenuTextAreas[3].contains(e.getLocationOnScreen())){//High Scores
@@ -767,7 +777,13 @@ public class Asteroids{
 						saveGame(saveFile);
 					}
 				}else if (pauseTextAreas[2].contains(e.getLocationOnScreen())){//Open
-					System.out.println("OPEN CLICKED");
+					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
+					int returnVal = fc.showOpenDialog(this);
+					if (returnVal == JFileChooser.APPROVE_OPTION){
+						File openFile = fc.getSelectedFile();
+						gameInitFromFile(openFile);
+					}
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (pauseTextAreas[4].contains(e.getLocationOnScreen())){//Exit Game
