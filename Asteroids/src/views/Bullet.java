@@ -17,4 +17,9 @@ public class Bullet extends BaseView implements Updatable {
 		shape.lineTo(1, 0);
 		shape.closePath();
 	}
+	
+	public boolean shouldDeconstruct() {
+		BulletModel m = (BulletModel)model;
+		return m.shouldDeconstruct();
+	}
 }
