@@ -15,6 +15,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.GeneralPath;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -108,7 +109,7 @@ public class Asteroids{
 		}catch (FileNotFoundException ex){
 			return false;
 		}
-		/*
+		
 		try{
 			asteroids = new ArrayList<Asteroid>();
 			bullets = new ArrayList<Bullet>();
@@ -168,7 +169,8 @@ public class Asteroids{
 				newVX = file.readDouble();
 				newVY = file.readDouble();
 				newVAngle = file.readDouble();
-				asteroids.add(new Asteroid(newX, newY, newAngle, newVX, newVY, newVAngle));
+				int newType = file.readInt();
+				asteroids.add(new Asteroid(newX, newY, newAngle, newVX, newVY, newVAngle, newType));
 			}
 			status = file.readInt();
 			if (status == 0){
@@ -193,13 +195,12 @@ public class Asteroids{
 				newVY = file.readDouble();
 				newVAngle = file.readDouble();
 				newLives = file.readInt();
-				alienShip = new AlienShip(newX,newY,newAngle,newVX,newVY,newVAngle,newLives);
+				alienShip = new AlienShip(newX,newY,newAngle,newVX,newVY,newVAngle);
 			}
 			file.close();
 		}catch (IOException ex){
 			return false;
 		}
-		*/
 		return true;
 	}
 	private boolean saveGame(File fout){
@@ -261,6 +262,7 @@ public class Asteroids{
 				file.writeDouble(asteroid.getVX());
 				file.writeDouble(asteroid.getVY());
 				file.writeDouble(asteroid.getVAngle());
+				file.writeInt(asteroid.getType());
 			}
 			if (rogueSpaceship == null){
 				file.writeInt(0);
@@ -293,7 +295,7 @@ public class Asteroids{
 		return true;
 	}
 	public void exit(){
-		//Write new high scores
+		//TODO: Write new high scores
 		System.exit(0);
 	}
 	public void initAsteroids(){
@@ -308,7 +310,7 @@ public class Asteroids{
 				do{
 					randY = (int)(Math.random()*screenHeight);
 				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100)&&(randY > player2.getY()-100)&&(randX < player2.getY()+100));
-				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random(),0));
 			}else{
 				do{
 					randX = (int)(Math.random()*screenWidth);
@@ -316,7 +318,7 @@ public class Asteroids{
 				do{
 					randY = (int)(Math.random()*screenHeight);
 				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100));
-				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random(),0));
 			}
 		}
 	}
@@ -519,6 +521,40 @@ public class Asteroids{
 			if (player2 != null){
 				g.setColor(Color.BLUE);
 				g.drawString(""+score2, getWidth()-fm.stringWidth(""+score2)-40, 40);
+			}
+			drawLives(g);
+		}
+		private void drawLives(Graphics2D g){
+			g.setColor(Color.white);
+			if (player1.getLives() == -1){ //Infinite Lives
+				g.drawString(""+((char) 8734), 40, 80);
+			}else{
+				for (int i = 0; i < player1.getLives(); i++){
+					GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 4);
+					shape.moveTo(20+30*i+0, 60-7);
+					shape.lineTo(20+30*i+7, 60+7);
+					shape.lineTo(20+30*i+0, 60+2);
+					shape.lineTo(20+30*i-7, 60+7);
+					shape.closePath();
+					g.draw(shape);
+				}
+			}
+			if (player2 != null){
+				g.setColor(Color.blue);
+				if (player2.getLives() == -1){
+					g.drawString(""+((char)8734),getWidth()-fm.stringWidth(""+score2)-40,80);
+				}else{
+					int width = getWidth()-fm.stringWidth(""+score2)-60;
+					for (int i = 0; i < player2.getLives(); i++){
+						GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 4);
+						shape.moveTo(width+30*i+0, 60-7);
+						shape.lineTo(width+30*i+7, 60+7);
+						shape.lineTo(width+30*i+0, 60+2);
+						shape.lineTo(width+30*i-7, 60+7);
+						shape.closePath();
+						g.draw(shape);
+					}
+				}
 			}
 		}
 		private void drawGravObject(Graphics2D g){
@@ -801,6 +837,8 @@ public class Asteroids{
 					int returnVal = fc.showOpenDialog(this);
 					if (returnVal == JFileChooser.APPROVE_OPTION){
 						File openFile = fc.getSelectedFile();
+						if (!openFile.getAbsolutePath().endsWith(".asteroids"))
+							openFile = new File(openFile + ".asteroids");
 						gameInitFromFile(openFile);
 					}
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
