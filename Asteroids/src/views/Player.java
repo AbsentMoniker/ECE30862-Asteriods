@@ -13,29 +13,22 @@ import Models.Updatable;
 public class Player implements Updatable {
 
 	private PlayerModel model;
-	private int x;
-	private int y;
-	private int angle;
+	private int playerNo;
 	
-	public Player(int startX, int startY){
-		x = startX;
-		y = startY;
-		angle = 0;
-		model = new PlayerModel(0);
+	public Player(int startX, int startY, int playerNo){
+		model = new PlayerModel(playerNo);
+		this.playerNo = playerNo;
 	}
 	@Override
 	public void update() {
 		model.update();
-		x += 5;
-		if (x > 1720)
-			x = 0;
-		angle += 1;
-		if (angle >= 360)
-			angle -= 360;
 	}
 	
 	public void paint(Graphics2D g, int width, int height){
-		g.setColor(Color.white);
+		if (playerNo == 0)
+			g.setColor(Color.white);
+		else
+			g.setColor(Color.blue);
 		GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
 		double [] pos = model.getPosition();
 		pos[0]*= width/100;

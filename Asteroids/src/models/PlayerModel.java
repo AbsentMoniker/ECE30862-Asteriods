@@ -18,7 +18,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	public PlayerModel(int playerNum) {
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
-		keyChecker = new KeyChecker();
+		keyChecker = KeyChecker.getInstance();
 	}
 	
 	@Override

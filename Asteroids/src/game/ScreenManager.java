@@ -112,7 +112,7 @@ public class ScreenManager {
     public void setFullScreen(DisplayMode displayMode) {
         final JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setUndecorated(true);
+        frame.setUndecorated(true);
         frame.setIgnoreRepaint(true);
         frame.setResizable(false);
         device.setFullScreenWindow(frame);

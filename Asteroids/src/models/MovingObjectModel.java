@@ -13,7 +13,7 @@ public abstract class MovingObjectModel implements Updatable {
 	// Rotational velocity in radians/sec, where positive is clockwise
 	protected double rotVel = 0;
 	// controls whether we should be counting time (e.g., false when paused)
-	protected boolean playing = false;
+	static protected boolean playing = false;
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
 	
@@ -53,7 +53,9 @@ public abstract class MovingObjectModel implements Updatable {
 	public final double getOrientation() {
 		return rotPos;
 	}
-	
+	public static final void setPlaying(boolean newPlaying){
+		playing = newPlaying;
+	}
 	public String toString() {
 		String retString;
 		retString = String.format("Pos: (%.1f, %.1f)\n", pos[0], pos[1]);
