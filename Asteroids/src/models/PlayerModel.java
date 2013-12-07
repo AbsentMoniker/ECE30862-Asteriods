@@ -14,13 +14,18 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	KeyChecker keyChecker;
 	// how long it's been since a print was issued
 	private long lastPrint = 0;
+	private long lastBullet = 0;
 	
-	public PlayerModel(int x, int y, int angle, double vx, double vy, double vAngle, int playerNum) {
+	private int burstLength = 0;
+	private boolean firingBullet = false;
+	
+	public PlayerModel(int x, int y, double angle, double vx, double vy, double vAngle, int playerNum) {
 		super(x, y, angle, vx, vy, vAngle);
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
 		keyChecker = KeyChecker.getInstance();
 		hitRad = 10;
+		lastBullet = System.nanoTime();
 	}
 	
 	@Override
@@ -41,7 +46,15 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		}
 		
 		if (keyChecker.getPlayerShooting(player)) {
-			// TODO spawn bullets
+			if (burstLength < 4) {
+				firingBullet = true;
+				burstLength++;
+				lastBullet = System.nanoTime();
+			}
+		} else {
+			if (System.nanoTime() - lastBullet > 0.2e9) {  // .2 seconds
+				burstLength = 0;
+			}
 		}
 		
 		super.update();
@@ -50,6 +63,16 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 			//System.out.println(this);
 			lastPrint = System.nanoTime();
 		}
+		
+		
+	}
+	
+	public boolean firesBullet() {
+		if (firingBullet == true) {
+			firingBullet = false;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

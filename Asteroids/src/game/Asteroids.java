@@ -158,6 +158,7 @@ public class Asteroids{
 			MovingObjectModel player1Model = player1.model;
 			if (astModel.collidesWith(player1Model)) {
 				// player 1 has hit an asteroid
+				//System.out.println("P1 hit an asteroid");
 			}
 			if (player2 != null) {
 				MovingObjectModel player2Model = player2.model;

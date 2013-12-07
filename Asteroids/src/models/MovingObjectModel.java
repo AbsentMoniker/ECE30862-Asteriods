@@ -20,7 +20,7 @@ public abstract class MovingObjectModel implements Updatable {
     // circle radius for hit detection
 	protected double hitRad = 0;
 
-	public MovingObjectModel(int x, int y, int angle, double vx, double vy, double vAngle){
+	public MovingObjectModel(int x, int y, double angle, double vx, double vy, double vAngle){
 		pos[0] = x;
 		pos[1] = y;
 		rotPos = angle;
