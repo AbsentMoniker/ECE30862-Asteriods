@@ -15,13 +15,25 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import views.AlienShip;
 import views.Asteroid;
+import views.Bullet;
 import views.Player;
 import views.RogueSpaceship;
 
@@ -36,6 +48,7 @@ public class Asteroids{
 	//Game Objects
 	private Player player1;
 	private Player player2;
+	private ArrayList<Bullet> bullets;
 	private ArrayList<Asteroid> asteroids;
 	private RogueSpaceship rogueSpaceship;
 	private AlienShip alienShip;
@@ -62,17 +75,199 @@ public class Asteroids{
 		score1 = 0;
 		score2 = 0;
 		level = startingLevel;
-		if (isSinglePlayer){
-			player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,0);
-			player2 = null;
+		if (unlimitedLives){
+			if (isSinglePlayer){
+				player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,-1,0);
+				player2 = null;
+			}else{
+				player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,-1,0);
+				player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,-1,1);
+			}
 		}else{
-			player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,0);
-			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
+			if (isSinglePlayer){
+				player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,3,0);
+				player2 = null;
+			}else{
+				player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,3,0);
+				player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,3,1);
+			}
 		}
+		rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
+		alienShip = new AlienShip(600,600,0,0,0,0);
 		initAsteroids();
-		alienShip = new AlienShip(100,100,0,0,0,0);
-		paused = false;
-		
+		paused = false;	
+	}
+	private boolean gameInitFromFile(File fin){
+		DataInputStream file;
+		try{
+			file = new DataInputStream(new BufferedInputStream(new FileInputStream(fin)));
+		}catch (FileNotFoundException ex){
+			return false;
+		}
+		try{
+			//write status
+			score1 = file.readInt();
+			score2 = file.readInt();
+			level = file.readInt();
+			
+			//write options
+			gravExists = file.readBoolean();
+			gravVisible = file.readBoolean();
+			unlimitedLives = file.readBoolean();
+			numAsteroids = file.readInt();
+			startingLevel = file.readInt();
+			isSinglePlayer = file.readBoolean();
+			
+			//write players
+			int newX = file.readInt();
+			int newY = file.readInt();
+			double newAngle = file.readDouble();
+			double newVX = file.readDouble();
+			double newVY = file.readDouble();
+			double newVAngle = file.readDouble();
+			int newLives = file.readInt();
+			int status = file.readInt();
+			player1 = new Player(newX,newY,newAngle,newVX,newVY,newVAngle, newLives,0);
+			if (status == 0){
+				player2 = null;
+			}else{
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX.readDouble();
+				newVY.readDouble();
+				newVAngle.readDouble();
+				newLives.readInt();
+				player2 = new Player(newX,newY,newAngle,newVX,newVY,newVAngle,newLives,1);
+			}
+			file.writeInt(asteroids.size());
+			for (Asteroid asteroid:asteroids){
+				file.writeInt(asteroid.getX());
+				file.writeInt(asteroid.getY());
+				file.writeInt(asteroid.getAngle());
+				file.writeDouble(asteroid.getVX());
+				file.writeDouble(asteroid.getVY());
+				file.writeDouble(asteroid.getVAngle());
+			}
+			if (rogueSpaceship == null){
+				file.writeInt(0);
+			}else{
+				file.writeInt(1);
+				file.writeInt(rogueSpaceship.getX());
+				file.writeInt(rogueSpaceship.getY());
+				file.writeInt(rogueSpaceship.getAngle());
+				file.writeDouble(rogueSpaceship.getVX());
+				file.writeDouble(rogueSpaceship.getVY());
+				file.writeDouble(rogueSpaceship.getVAngle());
+				file.writeInt(rogueSpaceship.getLives());
+			}
+			if (alienShip == null){
+				file.writeInt(0);
+			}else{
+				file.writeInt(1);
+				file.writeInt(alienShip.getX());
+				file.writeInt(alienShip.getY());
+				file.writeInt(alienShip.getAngle());
+				file.writeDouble(alienShip.getVX());
+				file.writeDouble(alienShip.getVY());
+				file.writeDouble(alienShip.getVAngle());
+				file.writeInt(alienShip.getLives());
+			}
+			file.close();
+		}catch (IOException ex){
+			return false;
+		}
+		return true;
+	}
+	private boolean saveGame(File fout){
+		DataOutputStream file;
+		try{
+			file = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fout)));
+		}catch(FileNotFoundException ex){
+			return false;
+		}
+		try{
+			//write status
+			file.writeInt(score1);
+			file.writeInt(score2);
+			file.writeInt(level);
+			
+			//write options
+			file.writeBoolean(gravExists);
+			file.writeBoolean(gravVisible);
+			file.writeBoolean(unlimitedLives);
+			file.writeInt(numAsteroids);
+			file.writeInt(startingLevel);
+			file.writeBoolean(isSinglePlayer);
+			
+			//write players
+			file.writeInt(player1.getX());
+			file.writeInt(player1.getY());
+			file.writeDouble(player1.getAngle());
+			file.writeDouble(player1.getVX());
+			file.writeDouble(player1.getVY());
+			file.writeDouble(player1.getVAngle());
+			file.writeInt(player1.getLives());
+			if (player2 == null){
+				file.writeInt(0);
+			}else{
+				file.writeInt(1);
+				file.writeInt(player2.getX());
+				file.writeInt(player2.getY());
+				file.writeDouble(player2.getAngle());
+				file.writeDouble(player2.getVX());
+				file.writeDouble(player2.getVY());
+				file.writeDouble(player2.getVAngle());
+				file.writeInt(player2.getLives());
+			}
+			file.writeInt(bullets.size());
+			for (Bullet bullet:bullets){
+				file.writeInt(bullet.getX());
+				file.writeInt(bullet.getY());
+				file.writeDouble(bullet.getAngle());
+				file.writeDouble(bullet.getVX());
+				file.writeDouble(bullet.getVY());
+				file.writeDouble(bullet.getVAngle());
+			}
+			file.writeInt(asteroids.size());
+			for (Asteroid asteroid:asteroids){
+				file.writeInt(asteroid.getX());
+				file.writeInt(asteroid.getY());
+				file.writeDouble(asteroid.getAngle());
+				file.writeDouble(asteroid.getVX());
+				file.writeDouble(asteroid.getVY());
+				file.writeDouble(asteroid.getVAngle());
+			}
+			if (rogueSpaceship == null){
+				file.writeInt(0);
+			}else{
+				file.writeInt(1);
+				file.writeInt(rogueSpaceship.getX());
+				file.writeInt(rogueSpaceship.getY());
+				file.writeDouble(rogueSpaceship.getAngle());
+				file.writeDouble(rogueSpaceship.getVX());
+				file.writeDouble(rogueSpaceship.getVY());
+				file.writeDouble(rogueSpaceship.getVAngle());
+				file.writeInt(rogueSpaceship.getLives());
+			}
+			if (alienShip == null){
+				file.writeInt(0);
+			}else{
+				file.writeInt(1);
+				file.writeInt(alienShip.getX());
+				file.writeInt(alienShip.getY());
+				file.writeDouble(alienShip.getAngle());
+				file.writeDouble(alienShip.getVX());
+				file.writeDouble(alienShip.getVY());
+				file.writeDouble(alienShip.getVAngle());
+				file.writeInt(alienShip.getLives());
+			}
+			
+			file.close();
+		}catch (IOException ex){
+			return false;
+		}
+		return true;
 	}
 	public void initAsteroids(){
 		asteroids = new ArrayList<Asteroid>();
@@ -152,6 +347,8 @@ public class Asteroids{
 			rogueSpaceship.update();
 		if (alienShip != null)
 			alienShip.update();
+		for (Bullet bullet:bullets)
+			bullet.update();
 	}
 	public static boolean isPaused(){
 		return paused;
@@ -256,6 +453,8 @@ public class Asteroids{
 				rogueSpaceship.paint(g);
 			if (alienShip != null)
 				alienShip.paint(g);
+			for (Bullet bullet:bullets)
+				bullet.paint(g);
 			for (Asteroid asteroid:asteroids)
 				asteroid.paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));
@@ -510,7 +709,13 @@ public class Asteroids{
 				if (mainMenuTextAreas[0].contains(e.getLocationOnScreen())){//Play
 					inMainMenu = false;
 				}else if (mainMenuTextAreas[1].contains(e.getLocationOnScreen())){//Load
-					
+					final JFileChooser fc = new JFileChooser();
+					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
+					int returnVal = fc.showOpenDialog(this);
+					if (returnVal == JFileChooser.APPROVE_OPTION){
+						File openFile = fc.getSelectedFile();
+						gameInitFromFile(openFile);
+					}
 				}else if (mainMenuTextAreas[2].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (mainMenuTextAreas[3].contains(e.getLocationOnScreen())){//High Scores
@@ -522,7 +727,13 @@ public class Asteroids{
 				if (pauseTextAreas[0].contains(e.getLocationOnScreen())){//Continue
 					paused = false;
 				}else if (pauseTextAreas[1].contains(e.getLocationOnScreen())){//Save
-					System.out.println("SAVE CLICKED");
+					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
+					int returnVal = fc.showSaveDialog(this);
+					if (returnVal == JFileChooser.APPROVE_OPTION){
+						File saveFile = fc.getSelectedFile();
+						saveGame(saveFile);
+					}
 				}else if (pauseTextAreas[2].contains(e.getLocationOnScreen())){//Open
 					System.out.println("OPEN CLICKED");
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
