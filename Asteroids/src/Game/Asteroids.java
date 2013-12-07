@@ -29,7 +29,8 @@ public class Asteroids{
 	private Player player2;
 	
 	//Game Status
-	private int score = 0;
+	private int score1 = 0;
+	private int score2 = 0;
 	private static boolean paused = false;
 	private boolean inOptions = false;
 	private int level = 1;
@@ -41,7 +42,7 @@ public class Asteroids{
 	private boolean gravExists = false;
 	private boolean gravVisible = false;
 	private boolean unlimitedLives = false;
-	private int numAsteroids;
+	private int numAsteroids = 1;
 	private int startingLevel = 1;
 	private boolean isSinglePlayer = true;
 	
@@ -55,7 +56,8 @@ public class Asteroids{
 		}
 		keyChecker = KeyChecker.getInstance();
 		paused = false;
-		score = 0;
+		score1 = 0;
+		score2 = 0;
 		level = startingLevel;
 	}
 	public static void main(String [] argv){
@@ -129,7 +131,7 @@ public class Asteroids{
 			
 			mainMenuTextAreas = new Rectangle[5];
 			pauseTextAreas = new Rectangle[5];
-			optionsTextAreas = new Rectangle[8];
+			optionsTextAreas = new Rectangle[10];
 		}
 		private void initClickAreas(){
 			fm = getBufferStrategy().getDrawGraphics().getFontMetrics(pauseFont);
@@ -179,7 +181,11 @@ public class Asteroids{
 				player2.paint(g,  getWidth(), getHeight());
 			g.setFont(new Font("Arial",Font.PLAIN,30));
 			g.setColor(Color.WHITE);
-			g.drawString(""+score, 40,40);
+			g.drawString(""+score1, 40,40);
+			if (player2 != null){
+				g.setColor(Color.BLUE);
+				g.drawString(""+score2, getWidth()-fm.stringWidth(""+score2)-40, 40);
+			}
 		}
 		private void drawGravObject(Graphics2D g){
 			g.setColor(new Color(50,50,50));
@@ -330,46 +336,69 @@ public class Asteroids{
 			
 			//Number of Asteroids
 			current = "Number of Asteroids: "+numAsteroids;
-			optionsTextAreas[3] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 425-lineHeight/2, fm.stringWidth(current),lineHeight);
+			g.setColor(Color.WHITE);
+			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 425);
+			
+			//Number of Asteroids +
+			optionsTextAreas[3] = new Rectangle((getWidth()+fm.stringWidth(current))/2+20, 425-(fm.getAscent()-fm.getDescent())*5/4, fm.stringWidth("+"),lineHeight/2);
 			if (optionsTextAreas[3].contains(MouseInfo.getPointerInfo().getLocation()))
 				g.setColor(Color.RED);
 			else
 				g.setColor(Color.WHITE);
-			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 425);
+			g.drawString("+", (getWidth()+fm.stringWidth(current))/2+20, 425-(fm.getAscent()+fm.getDescent())/4);
+			
+			//Number of Asteroids -
+			optionsTextAreas[4] = new Rectangle((getWidth()+fm.stringWidth(current))/2+20+(fm.stringWidth("+")-fm.stringWidth("-"))/4, 425-5, fm.stringWidth("-"),lineHeight/4);
+			if (optionsTextAreas[4].contains(MouseInfo.getPointerInfo().getLocation()))
+				g.setColor(Color.RED);
+			else
+				g.setColor(Color.WHITE);
+			g.drawString("-", (getWidth()+fm.stringWidth(current))/2+20+(fm.stringWidth("+")-fm.stringWidth("-"))/4, 425+(fm.getAscent()+fm.getDescent())/4);
 			
 			//Reset High Score Holder
 			current = "Reset High Scores";
-			optionsTextAreas[4] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 500-lineHeight/2, fm.stringWidth(current),lineHeight);
-			if (optionsTextAreas[4].contains(MouseInfo.getPointerInfo().getLocation()))
+			optionsTextAreas[5] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 500-lineHeight/2, fm.stringWidth(current),lineHeight);
+			if (optionsTextAreas[5].contains(MouseInfo.getPointerInfo().getLocation()))
 				g.setColor(Color.RED);
 			else
 				g.setColor(Color.WHITE);
 			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 500);
 			
 			//Starting Level
+			g.setColor(Color.WHITE);
 			current = "Starting Level: "+startingLevel;
-			optionsTextAreas[5] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 575-lineHeight/2, fm.stringWidth(current),lineHeight);
-			if (optionsTextAreas[5].contains(MouseInfo.getPointerInfo().getLocation()))
+			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 575);
+			
+			//Starting Level +
+			optionsTextAreas[6] = new Rectangle((getWidth()+fm.stringWidth(current))/2+20, 575-(fm.getAscent()-fm.getDescent())*5/4, fm.stringWidth("+"),lineHeight/2);
+			if (optionsTextAreas[6].contains(MouseInfo.getPointerInfo().getLocation()))
 				g.setColor(Color.RED);
 			else
 				g.setColor(Color.WHITE);
-			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 575);
+			g.drawString("+", (getWidth()+fm.stringWidth(current))/2+20, 575-(fm.getAscent()+fm.getDescent())/4);
 			
+			//Starting Level -
+			optionsTextAreas[7] = new Rectangle((getWidth()+fm.stringWidth(current))/2+20+(fm.stringWidth("+")-fm.stringWidth("-"))/4, 575-5, fm.stringWidth("-"),lineHeight/4);
+			if (optionsTextAreas[7].contains(MouseInfo.getPointerInfo().getLocation()))
+				g.setColor(Color.RED);
+			else
+				g.setColor(Color.WHITE);
+			g.drawString("-", (getWidth()+fm.stringWidth(current))/2+20+(fm.stringWidth("+")-fm.stringWidth("-"))/4, 575+(fm.getAscent()+fm.getDescent())/4);
 			//Mode
 			if (isSinglePlayer)
 				current = "Mode: Single Player";
 			else
 				current = "Mode: Mulitplayer";
-			optionsTextAreas[6] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 650-lineHeight/2, fm.stringWidth(current),lineHeight);
-			if (optionsTextAreas[6].contains(MouseInfo.getPointerInfo().getLocation()))
+			optionsTextAreas[8] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 650-lineHeight/2, fm.stringWidth(current),lineHeight);
+			if (optionsTextAreas[8].contains(MouseInfo.getPointerInfo().getLocation()))
 				g.setColor(Color.RED);
 			else
 				g.setColor(Color.WHITE);
 			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 650);
 			//Done
 			current = "Done";
-			optionsTextAreas[7] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 725-lineHeight/2, fm.stringWidth(current),lineHeight);
-			if (optionsTextAreas[7].contains(MouseInfo.getPointerInfo().getLocation()))
+			optionsTextAreas[9] = new Rectangle((getWidth()-fm.stringWidth(current))/2, 725-lineHeight/2, fm.stringWidth(current),lineHeight);
+			if (optionsTextAreas[9].contains(MouseInfo.getPointerInfo().getLocation()))
 				g.setColor(Color.RED);
 			else
 				g.setColor(Color.WHITE);
@@ -383,15 +412,19 @@ public class Asteroids{
 					gravVisible = !gravVisible;
 				}else if (optionsTextAreas[2].contains(e.getLocationOnScreen())){//Unlimited Lives
 					unlimitedLives = !unlimitedLives;
-				}else if (optionsTextAreas[3].contains(e.getLocationOnScreen())){//Asteroid Number
+				}else if (optionsTextAreas[3].contains(e.getLocationOnScreen())){//Asteroid Number +
+					numAsteroids++;
+				}else if (optionsTextAreas[4].contains(e.getLocationOnScreen())){//Asteroid Number -
+					numAsteroids = numAsteroids == 1 ? 1 : numAsteroids-1;
+				}else if (optionsTextAreas[5].contains(e.getLocationOnScreen())){//Reset high Score
 					
-				}else if (optionsTextAreas[4].contains(e.getLocationOnScreen())){//Reset high Score
-					
-				}else if (optionsTextAreas[5].contains(e.getLocationOnScreen())){//Start Level
-					
-				}else if (optionsTextAreas[6].contains(e.getLocationOnScreen())){//Mode
+				}else if (optionsTextAreas[6].contains(e.getLocationOnScreen())){//Start Level +
+					startingLevel++;
+				}else if (optionsTextAreas[7].contains(e.getLocationOnScreen())){//Start Level -
+					startingLevel = startingLevel == 1 ? 1 : startingLevel-1;
+				}else if (optionsTextAreas[8].contains(e.getLocationOnScreen())){//Mode
 					isSinglePlayer = !isSinglePlayer;
-				}else if (optionsTextAreas[7].contains(e.getLocationOnScreen())){//Done
+				}else if (optionsTextAreas[9].contains(e.getLocationOnScreen())){//Done
 					inOptions = false;
 				}
 			}else if (inMainMenu){
