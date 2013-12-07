@@ -15,10 +15,12 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import views.Asteroid;
 import views.Player;
 
 import models.KeyChecker;
@@ -29,6 +31,7 @@ public class Asteroids{
 	//Game Objects
 	private Player player1;
 	private Player player2;
+	private ArrayList<Asteroid> asteroids;
 	
 	//Game Status
 	private int score1 = 0;
@@ -56,6 +59,8 @@ public class Asteroids{
 			player1 = new Player(250, 500, 0);
 			player2 = new Player(750, 500, 1);
 		}
+		asteroids = new ArrayList<Asteroid>();
+		asteroids.add(new Asteroid(500,500,3,3,0,1));
 		keyChecker = KeyChecker.getInstance();
 		paused = false;
 		score1 = 0;
@@ -181,6 +186,9 @@ public class Asteroids{
 			player1.paint(g, getWidth(), getHeight());
 			if (player2 != null)
 				player2.paint(g,  getWidth(), getHeight());
+			g.setColor(Color.WHITE);
+			for (Asteroid asteroid:asteroids)
+				asteroid.paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));
 			g.setColor(Color.WHITE);
 			g.drawString(""+score1, 40,40);

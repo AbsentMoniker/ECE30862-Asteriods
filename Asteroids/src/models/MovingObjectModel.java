@@ -17,6 +17,10 @@ public abstract class MovingObjectModel implements Updatable {
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
 	
+	public MovingObjectModel(){
+		pos[0] = 50;
+		pos[1] = 50;
+	}
 	public void update() {
 		if (playing == false) {
 			// we weren't updating, now we are; get the time and return
