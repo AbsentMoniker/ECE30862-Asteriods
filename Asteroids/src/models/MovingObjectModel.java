@@ -23,6 +23,8 @@ public abstract class MovingObjectModel implements Updatable {
 	protected double dist = 0;
 	// lives
 	protected int lives = 0;
+	// top speed
+	protected double speedLimit = -1;
 
 	public MovingObjectModel(int x, int y, double angle, double vx, double vy, double vAngle){
 		pos[0] = x;
@@ -48,6 +50,7 @@ public abstract class MovingObjectModel implements Updatable {
 		
 		// update velocity and then position for both X, Y
 		// bounds check and "warp" position if necessary
+		double[] oldVel = vel.clone();
 		for (int i = 0; i < pos.length; i++) {
 			/*
 			if (this instanceof AsteroidModel){
@@ -61,6 +64,14 @@ public abstract class MovingObjectModel implements Updatable {
 				pos[i] = pos[i] + Asteroids.getScreenDims()[i];
 			else if (pos[i] > Asteroids.getScreenDims()[i])
 				pos[i] = pos[i] - Asteroids.getScreenDims()[i];
+		}
+		
+		if (speedLimit > 0) {
+			double curSpeed = Math.sqrt( Math.pow(vel[0], 2) + Math.pow(vel[1], 2) );
+			if (curSpeed > speedLimit) {
+				vel[0] *= speedLimit / curSpeed;
+				vel[1] *= speedLimit / curSpeed;
+			}
 		}
 		
 		// update rotational position

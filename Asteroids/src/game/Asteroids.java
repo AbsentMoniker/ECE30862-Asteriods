@@ -464,9 +464,10 @@ public class Asteroids{
 			bullets.add(newBullet);
 		}
 		
+		PlayerModel p2Model = null;
 		if (player2 != null) {
 			// spawn bullet for P1
-			PlayerModel p2Model = (PlayerModel)player2.model;
+			p2Model = (PlayerModel)player2.model;
 			if (p2Model.firesBullet()) {
 				Bullet newBullet;
 				double[] bPos = p2Model.bulletPos();
@@ -481,6 +482,7 @@ public class Asteroids{
 			// check against asteroids
 			Bullet b = bIt.next();
 			MovingObjectModel bModel = b.model;
+			boolean collided = false;
 			for (Iterator<Asteroid> aIt = asteroids.iterator(); aIt.hasNext();) {
 				Asteroid ast = aIt.next();
 				MovingObjectModel astModel = ast.model;
@@ -488,10 +490,48 @@ public class Asteroids{
 					// TODO spawn three small asteroids if this one was big
 					bIt.remove();
 					aIt.remove();
+					collided = true;
+					break;
+				}
+			}
+			if (collided)
+				continue;
+			
+			if (p1Model.collidesWith(bModel)) {
+				// TODO bullet hit p1
+				continue;
+			}
+			
+			if (player2 != null) {
+				if (p2Model.collidesWith(bModel)) {
+					// TODO bullet hit p2
+					continue;
 				}
 			}
 			
+			if (alienShip != null) {
+				MovingObjectModel alienModel = alienShip.model;
+				if (alienModel.collidesWith(bModel)) {
+					// TODO bullet hit alien ship
+					System.out.println("Bullet hit alien");
+					boolean alienAlive = alienModel.decrementLives();
+					if (alienAlive == false) {
+						alienShip = null;
+					}
+					bIt.remove();
+					continue;
+				}
+			}
 			
+			if (rogueSpaceship != null) {
+				MovingObjectModel rogueModel = rogueSpaceship.model;
+				if (rogueModel.collidesWith(bModel)) {
+					// TODO bullet hit rogue ship
+					rogueSpaceship = null;
+					bIt.remove();
+					continue;
+				}
+			}
 		}
 	}
 	
