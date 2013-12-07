@@ -8,6 +8,8 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	private final double shipRotationSpeed = 2.5;
 	// bullet relative velocity
 	private final double bulletSpeed = 200;
+	// player maximum speed
+	private final double maxSpeed = 500;
 	
 	// VARIABLES
 	// which player this is (0 or 1)
@@ -32,9 +34,10 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
 		keyChecker = KeyChecker.getInstance();
-		hitRad = 10;
+		hitRad = 20;
 		lastBullet = System.nanoTime();
 		lives = numLives;
+		speedLimit = maxSpeed;
 	}
 	
 	@Override
@@ -69,7 +72,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		super.update();
 		
 		// add slowdown effect
-		
+		// TODO add slowdown effect
 		
 		if (System.nanoTime() - lastPrint > 1e9) {
 			//System.out.println(this);
