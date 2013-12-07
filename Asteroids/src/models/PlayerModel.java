@@ -15,7 +15,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	// how long it's been since a print was issued
 	private long lastPrint = 0;
 	
-	public PlayerModel(int x, int y, int angle, int vx, int vy, int vAngle, int playerNum) {
+	public PlayerModel(int x, int y, int angle, double vx, double vy, double vAngle, int playerNum) {
 		super(x, y, angle, vx, vy, vAngle);
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;

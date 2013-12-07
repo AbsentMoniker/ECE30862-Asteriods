@@ -15,7 +15,7 @@ public class Player extends BaseView implements Updatable {
 
 	private int playerNo;
 	
-	public Player(int x, int y, int angle, int vx, int vy, int vAngle, int playerNo){
+	public Player(int x, int y, int angle, double vx, double vy, double vAngle, int playerNo){
 		model = new PlayerModel(x, y, angle, vx, vy, vAngle, playerNo);
 		this.playerNo = playerNo;
 		if (playerNo == 0)

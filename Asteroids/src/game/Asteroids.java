@@ -63,12 +63,14 @@ public class Asteroids{
 			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
 		}
 		asteroids = new ArrayList<Asteroid>();
-		asteroids.add(new Asteroid(500,500,0,3,4,1));
-		keyChecker = KeyChecker.getInstance();
+		asteroids.add(new Asteroid(500,500,0,10.0,6.0,0.5));
 		paused = false;
 		score1 = 0;
 		score2 = 0;
 		level = startingLevel;
+	}
+	public Asteroids(){
+		keyChecker = KeyChecker.createInstance(this);
 	}
 	public static void main(String [] argv){
 		new Asteroids().start();
@@ -118,10 +120,18 @@ public class Asteroids{
 	public static boolean isPaused(){
 		return paused;
 	}
-	public static void togglePaused(){
+	public void togglePaused(){
 		paused = !paused;
 		if (paused)
-			MovingObjectModel.setPlaying(false);
+			pauseObjects();
+	}
+	public void pauseObjects(){
+		if (player1 != null)
+			player1.pause();
+		if (player2 != null)
+			player2.pause();
+		for (Asteroid asteroid: asteroids)
+			asteroid.pause();
 	}
 	public static int getScreenWidth(){
 		return screenWidth;
@@ -206,7 +216,6 @@ public class Asteroids{
 			player1.paint(g);
 			if (player2 != null)
 				player2.paint(g);
-			g.setColor(Color.WHITE);
 			for (Asteroid asteroid:asteroids)
 				asteroid.paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));

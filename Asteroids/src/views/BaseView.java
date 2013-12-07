@@ -30,4 +30,8 @@ public abstract class BaseView implements Updatable{
 		drawing.transform(at);
 		g.draw(drawing);
 	}
+	
+	public void pause(){
+		model.setPlaying(false);
+	}
 }
