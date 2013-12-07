@@ -34,4 +34,11 @@ public abstract class BaseView implements Updatable{
 	public void pause(){
 		model.setPlaying(false);
 	}
+	
+	public int getX(){
+		return (int)model.getPosition()[0];
+	}
+	public int getY(){
+		return (int)model.getPosition()[1];
+	}
 }

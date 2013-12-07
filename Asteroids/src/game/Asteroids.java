@@ -55,6 +55,9 @@ public class Asteroids{
 	private boolean isSinglePlayer = true;
 	
 	private void gameInit(){
+		score1 = 0;
+		score2 = 0;
+		level = startingLevel;
 		if (isSinglePlayer){
 			player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,0);
 			player2 = null;
@@ -62,12 +65,33 @@ public class Asteroids{
 			player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,0);
 			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
 		}
-		asteroids = new ArrayList<Asteroid>();
-		asteroids.add(new Asteroid(500,500,0,10.0,6.0,0.5));
+		initAsteroids();
 		paused = false;
-		score1 = 0;
-		score2 = 0;
-		level = startingLevel;
+		
+	}
+	public void initAsteroids(){
+		asteroids = new ArrayList<Asteroid>();
+		int randX;
+		int randY;
+		for (int i = 0; i < level + 2; i++){
+			if (player2 != null){
+				do{
+					randX = (int)(Math.random()*screenWidth);
+				}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100)&&(randX > player2.getX()-100)&&(randX < player2.getX()+100));
+				do{
+					randY = (int)(Math.random()*screenHeight);
+				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100)&&(randY > player2.getY()-100)&&(randX < player2.getY()+100));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+			}else{
+				do{
+					randX = (int)(Math.random()*screenWidth);
+				}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100));
+				do{
+					randY = (int)(Math.random()*screenHeight);
+				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+			}
+		}
 	}
 	public Asteroids(){
 		keyChecker = KeyChecker.createInstance(this);

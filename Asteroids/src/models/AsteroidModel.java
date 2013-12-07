@@ -7,11 +7,4 @@ public class AsteroidModel extends MovingObjectModel implements Updatable {
 		acc[0] = 0;
 		acc[1] = 0;
 	}
-	
-	@Override
-	public void update(){
-		System.out.println("Asteroid: "+ pos[0] + ", "+ pos[1]);
-		super.update();
-		
-	}
 }
