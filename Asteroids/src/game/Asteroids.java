@@ -349,7 +349,21 @@ public class Asteroids{
 			alienShip.update();
 		for (Bullet bullet:bullets)
 			bullet.update();
+		for (Asteroid asteroid:asteroids) {
+			MovingObjectModel astModel = asteroid.model;
+			MovingObjectModel player1Model = player1.model;
+			if (astModel.collidesWith(player1Model)) {
+				// player 1 has hit an asteroid
+			}
+			if (player2 != null) {
+				MovingObjectModel player2Model = player2.model;
+				if (astModel.collidesWith(player2Model)) {
+					// player 2 has hit an asteroid
+				}
+			}
+		}
 	}
+	
 	public static boolean isPaused(){
 		return paused;
 	}

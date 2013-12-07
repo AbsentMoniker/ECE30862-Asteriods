@@ -20,6 +20,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
 		keyChecker = KeyChecker.getInstance();
+		hitRad = 10;
 	}
 	
 	@Override
@@ -46,7 +47,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		super.update();
 		
 		if (System.nanoTime() - lastPrint > 1e9) {
-			System.out.println(this);
+			//System.out.println(this);
 			lastPrint = System.nanoTime();
 		}
 	}

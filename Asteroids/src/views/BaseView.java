@@ -10,7 +10,7 @@ import models.Updatable;
 
 public abstract class BaseView implements Updatable{
 	protected GeneralPath shape;
-	protected MovingObjectModel model;
+	public MovingObjectModel model;
 	protected Color color;
 	
 	@Override

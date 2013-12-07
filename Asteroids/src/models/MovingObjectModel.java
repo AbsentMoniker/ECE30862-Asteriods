@@ -17,6 +17,8 @@ public abstract class MovingObjectModel implements Updatable {
 	protected boolean playing = false;
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
+    // circle radius for hit detection
+	protected double hitRad = 0;
 
 	public MovingObjectModel(int x, int y, int angle, double vx, double vy, double vAngle){
 		pos[0] = x;
@@ -26,6 +28,7 @@ public abstract class MovingObjectModel implements Updatable {
 		vel[1] = vy;
 		rotVel = vAngle;
 	}
+	
 	public void update() {
 		if (playing == false) {
 			// we weren't updating, now we are; get the time and return
@@ -42,10 +45,12 @@ public abstract class MovingObjectModel implements Updatable {
 		// update velocity and then position for both X, Y
 		// bounds check and "warp" position if necessary
 		for (int i = 0; i < pos.length; i++) {
+			/*
 			if (this instanceof AsteroidModel){
 				System.out.println("position "+i+" updated by: "+vel[i]*seconds);
 				System.out.println("vel["+i+"]: " + vel[i]+", seconds: "+seconds);
 			}
+			*/
 			vel[i] += acc[i] * seconds;
 			pos[i] += vel[i] * seconds;
 			if (pos[i] < 0)
@@ -59,6 +64,13 @@ public abstract class MovingObjectModel implements Updatable {
 		rotPos %= 2 * Math.PI;
 	}
 	
+	public final boolean collidesWith(MovingObjectModel obj) {
+		double separationDistance = Math.sqrt( Math.pow(pos[0] - obj.pos[0], 2) + Math.pow(pos[1] - obj.pos[1], 2) );
+		if (separationDistance < hitRad + obj.hitRad)
+			return true;
+		return false;
+	}
+	
 	public final double[] getPosition() {
 		return pos.clone();
 	}
@@ -66,9 +78,11 @@ public abstract class MovingObjectModel implements Updatable {
 	public final double getOrientation() {
 		return rotPos;
 	}
+	
 	public final void setPlaying(boolean newPlaying){
 		playing = newPlaying;
 	}
+	
 	public String toString() {
 		String retString;
 		retString = String.format("Pos: (%.1f, %.1f)\n", pos[0], pos[1]);
