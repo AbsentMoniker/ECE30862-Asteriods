@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import views.AlienShip;
 import views.Asteroid;
 import views.Player;
+import views.RogueSpaceship;
 
 import models.KeyChecker;
 import models.MovingObjectModel;
@@ -35,6 +37,8 @@ public class Asteroids{
 	private Player player1;
 	private Player player2;
 	private ArrayList<Asteroid> asteroids;
+	private RogueSpaceship rogueSpaceship;
+	private AlienShip alienShip;
 	
 	//Game Status
 	private int score1 = 0;
@@ -66,6 +70,7 @@ public class Asteroids{
 			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
 		}
 		initAsteroids();
+		alienShip = new AlienShip(100,100,0,0,0,0);
 		paused = false;
 		
 	}
@@ -124,11 +129,7 @@ public class Asteroids{
 					if (paused){
 					
 					}else{
-						player1.update();
-						if (player2 != null)
-							player2.update();
-						for (Asteroid asteroid:asteroids)
-							asteroid.update();
+						updateObjects();
 					}
 					canvas.update();
 					try{
@@ -141,6 +142,17 @@ public class Asteroids{
 		}
 	}
 	
+	public void updateObjects(){
+		player1.update();
+		if (player2 != null)
+			player2.update();
+		for (Asteroid asteroid:asteroids)
+			asteroid.update();
+		if (rogueSpaceship != null)
+			rogueSpaceship.update();
+		if (alienShip != null)
+			alienShip.update();
+	}
 	public static boolean isPaused(){
 		return paused;
 	}
@@ -240,6 +252,10 @@ public class Asteroids{
 			player1.paint(g);
 			if (player2 != null)
 				player2.paint(g);
+			if (rogueSpaceship != null)
+				rogueSpaceship.paint(g);
+			if (alienShip != null)
+				alienShip.paint(g);
 			for (Asteroid asteroid:asteroids)
 				asteroid.paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));
