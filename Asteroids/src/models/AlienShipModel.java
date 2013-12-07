@@ -16,7 +16,6 @@ public class AlienShipModel extends MovingObjectModel implements Updatable {
 	
 	@Override
 	public boolean decrementLives() {
-		System.out.println("Alien life lost");
 		if (lives > 0) {
 			lives--;
 			return true;

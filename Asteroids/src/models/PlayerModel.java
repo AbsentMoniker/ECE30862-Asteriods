@@ -1,5 +1,7 @@
 package models;
 
+import game.Asteroids;;
+
 public class PlayerModel extends MovingObjectModel implements Updatable {
 	// CONSTANTS
 	// player acceleration constant, in points/s^2
@@ -10,6 +12,8 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	private final double bulletSpeed = 200;
 	// player maximum speed
 	private final double maxSpeed = 500;
+	// gravity scale factor
+	private final double gravScale = 1000000;
 	
 	// VARIABLES
 	// which player this is (0 or 1)
@@ -29,6 +33,9 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	// number of remaining lives
 	private int lives = 3;
 	
+	// whether the grav object exists
+	private boolean gravExists = false;
+	
 	public PlayerModel(int x, int y, double angle, double vx, double vy, double vAngle, int numLives, int playerNum) {
 		super(x, y, angle, vx, vy, vAngle);
 		System.out.println("Player model " + playerNum + " instantiated");
@@ -40,6 +47,10 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		speedLimit = maxSpeed;
 	}
 	
+	public void setGravExists(boolean exists) {
+		gravExists = exists;
+	}
+	
 	@Override
 	public void update() {
 		if (keyChecker.getPlayerAccelerating(player)) {
@@ -47,6 +58,26 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 			acc[1] = Math.cos(rotPos) * shipAcceleration;
 		} else {
 			acc[0] = acc[1] = 0;
+		}
+		
+		if (gravExists) {
+			double gravXPos = Asteroids.getScreenDims()[0] / 2;
+			double gravYPos = Asteroids.getScreenDims()[1] / 2;
+			double distToGravX = pos[0] - gravXPos;
+			double distToGravY = pos[1] - gravYPos;
+			double distToGrav = Math.sqrt( Math.pow(distToGravX, 2) + 
+					Math.pow(distToGravY, 2) );
+			if (distToGrav < 1.0)
+				distToGrav = 1.0;
+			double gravAcc = gravScale / (Math.pow(distToGrav, 2) + 1);
+			if (gravAcc > shipAcceleration)
+				gravAcc = shipAcceleration * 0.9;
+			double gravAccX = -gravAcc * (distToGravX / distToGrav);
+			double gravAccY = -gravAcc * (distToGravY / distToGrav);
+			
+			acc[0] += gravAccX;
+			acc[1] += gravAccY;
+			System.out.println("Full: " + gravAcc + " X: " + gravAccX);
 		}
 		
 		if (keyChecker.getPlayerDirection(player) == 'l') {
