@@ -96,7 +96,7 @@ public class Asteroids{
 			}
 		}
 		rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
-		alienShip = new AlienShip(600,600,0,0,0,0,3);
+		alienShip = new AlienShip(600,600,0,0,0,0);
 		initAsteroids();
 		bullets = new ArrayList<Bullet>();
 		paused = false;	

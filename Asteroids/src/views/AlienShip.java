@@ -7,8 +7,8 @@ import models.AlienShipModel;
 import models.Updatable;
 
 public class AlienShip extends BaseView implements Updatable {
-	public AlienShip(int x, int y, double angle, double vx, double vy, double vAngle, int lives){
-		model = new AlienShipModel(x,y,angle,vx,vy,vAngle, lives);
+	public AlienShip(int x, int y, double angle, double vx, double vy, double vAngle){
+		model = new AlienShipModel(x,y,angle,vx,vy,vAngle);
 		color = Color.green;
 		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD,10);
 		shape.moveTo(-15, 0);

@@ -19,6 +19,8 @@ public abstract class MovingObjectModel implements Updatable {
 	protected long lastUpdate = 0;
     // circle radius for hit detection
 	protected double hitRad = 0;
+	// lives
+	protected int lives = 0;
 
 	public MovingObjectModel(int x, int y, double angle, double vx, double vy, double vAngle){
 		pos[0] = x;
@@ -93,7 +95,7 @@ public abstract class MovingObjectModel implements Updatable {
 	
 	// overridden by subclasses that want to
 	public int getLives() {
-		return 0;
+		return lives;
 	}
 	
 	public boolean decrementLives() {

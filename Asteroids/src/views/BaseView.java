@@ -56,7 +56,7 @@ public abstract class BaseView implements Updatable{
 
 	public Color getColor(){
 		return color;
-
+	}
 	public int getLives() {
 		return model.getLives();
 	}
