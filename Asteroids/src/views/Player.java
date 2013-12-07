@@ -23,9 +23,10 @@ public class Player extends BaseView implements Updatable {
 		else
 			color = Color.blue;
 		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-		shape.moveTo(0, 20);
-		shape.lineTo(10, -20);
-		shape.lineTo(-10, -20);
+		shape.moveTo(0, 14);
+		shape.lineTo(14, -14);
+		shape.lineTo(0, -5);
+		shape.lineTo(-14, -14);
 		shape.closePath();
 	}
 }
