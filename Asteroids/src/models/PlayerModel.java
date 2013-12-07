@@ -1,9 +1,9 @@
-package Models;
+package models;
 
 public class PlayerModel extends MovingObjectModel implements Updatable {
 	// CONSTANTS
 	// player acceleration constant, in points/s^2
-	private final double shipAcceleration = 10;
+	private final double shipAcceleration = 80;
 	// player rotation constant, in rad/s
 	private final double shipRotationSpeed = 2.5;
 	
@@ -15,10 +15,12 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	// how long it's been since a print was issued
 	private long lastPrint = 0;
 	
-	public PlayerModel(int playerNum) {
+	public PlayerModel(int x, int y, int angle, double vx, double vy, double vAngle, int playerNum) {
+		super(x, y, angle, vx, vy, vAngle);
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
 		keyChecker = KeyChecker.getInstance();
+		hitRad = 10;
 	}
 	
 	@Override
@@ -45,7 +47,7 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		super.update();
 		
 		if (System.nanoTime() - lastPrint > 1e9) {
-			System.out.println(this);
+			//System.out.println(this);
 			lastPrint = System.nanoTime();
 		}
 	}

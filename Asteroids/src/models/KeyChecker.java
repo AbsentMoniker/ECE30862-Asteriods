@@ -1,10 +1,11 @@
-package Models;
+package models;
+
+import game.Asteroids;
 
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
-import Game.Asteroids;
 
 public class KeyChecker {
 	private char playerDir[] = new char[2];
@@ -16,14 +17,16 @@ public class KeyChecker {
 	private boolean escapePressed;
 	
 	private static KeyChecker instance;
-	
-	public static KeyChecker getInstance(){
-		if (instance == null){
-			instance = new KeyChecker();
-		}
+	private Asteroids game;
+	public static KeyChecker createInstance(Asteroids game){
+		instance = new KeyChecker(game);
 		return instance;
 	}
-	private KeyChecker() {
+	public static KeyChecker getInstance(){
+		return instance;
+	}
+	private KeyChecker(Asteroids newGame) {
+		this.game = newGame;
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent ke) {
@@ -58,7 +61,7 @@ public class KeyChecker {
                     		break;
                     	case KeyEvent.VK_ESCAPE:
                     		escapePressed = true;
-                    		Asteroids.togglePaused();
+                    		game.togglePaused();
                     		break;
                     	}
                         break;

@@ -1,8 +1,9 @@
-package Models;
+package models;
+
+import game.Asteroids;
 
 public abstract class MovingObjectModel implements Updatable {
     // X and Y positions in points (pos[0] is X, pos[1] is Y)
-	// imaginary FOV is 100x100 points
 	protected double pos[] = new double[2];
 	// X and Y velocities in points/sec (vel[0] is X, vel[1] is Y)
 	protected double vel[] = new double[2];
@@ -13,9 +14,20 @@ public abstract class MovingObjectModel implements Updatable {
 	// Rotational velocity in radians/sec, where positive is clockwise
 	protected double rotVel = 0;
 	// controls whether we should be counting time (e.g., false when paused)
-	static protected boolean playing = false;
+	protected boolean playing = false;
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
+    // circle radius for hit detection
+	protected double hitRad = 0;
+
+	public MovingObjectModel(int x, int y, int angle, double vx, double vy, double vAngle){
+		pos[0] = x;
+		pos[1] = y;
+		rotPos = angle;
+		vel[0] = vx;
+		vel[1] = vy;
+		rotVel = vAngle;
+	}
 	
 	public void update() {
 		if (playing == false) {
@@ -27,23 +39,36 @@ public abstract class MovingObjectModel implements Updatable {
 		
 		// we've already been updating for some time
 		// seconds is time since last valid update
-		double seconds = (System.nanoTime() - lastUpdate) / 1e9;
+		double seconds = (System.nanoTime() - lastUpdate) / 1.0e9;
 		lastUpdate = System.nanoTime();
 		
 		// update velocity and then position for both X, Y
 		// bounds check and "warp" position if necessary
 		for (int i = 0; i < pos.length; i++) {
+			/*
+			if (this instanceof AsteroidModel){
+				System.out.println("position "+i+" updated by: "+vel[i]*seconds);
+				System.out.println("vel["+i+"]: " + vel[i]+", seconds: "+seconds);
+			}
+			*/
 			vel[i] += acc[i] * seconds;
 			pos[i] += vel[i] * seconds;
 			if (pos[i] < 0)
-				pos[i] = pos[i] + 100;
-			else if (pos[i] > 100)
-				pos[i] = pos[i] - 100;
+				pos[i] = pos[i] + Asteroids.getScreenDims()[i];
+			else if (pos[i] > Asteroids.getScreenDims()[i])
+				pos[i] = pos[i] - Asteroids.getScreenDims()[i];
 		}
 		
 		// update rotational position
 		rotPos += rotVel * seconds;
 		rotPos %= 2 * Math.PI;
+	}
+	
+	public final boolean collidesWith(MovingObjectModel obj) {
+		double separationDistance = Math.sqrt( Math.pow(pos[0] - obj.pos[0], 2) + Math.pow(pos[1] - obj.pos[1], 2) );
+		if (separationDistance < hitRad + obj.hitRad)
+			return true;
+		return false;
 	}
 	
 	public final double[] getPosition() {
@@ -53,9 +78,11 @@ public abstract class MovingObjectModel implements Updatable {
 	public final double getOrientation() {
 		return rotPos;
 	}
-	public static final void setPlaying(boolean newPlaying){
+	
+	public final void setPlaying(boolean newPlaying){
 		playing = newPlaying;
 	}
+	
 	public String toString() {
 		String retString;
 		retString = String.format("Pos: (%.1f, %.1f)\n", pos[0], pos[1]);

@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -15,18 +15,30 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import Models.KeyChecker;
-import Models.MovingObjectModel;
-import Views.Player;
+import views.AlienShip;
+import views.Asteroid;
+import views.Player;
+import views.RogueSpaceship;
+
+import models.KeyChecker;
+import models.MovingObjectModel;
+
 
 public class Asteroids{
+	public static int screenWidth;
+	public static int screenHeight;
+	
 	//Game Objects
 	private Player player1;
 	private Player player2;
+	private ArrayList<Asteroid> asteroids;
+	private RogueSpaceship rogueSpaceship;
+	private AlienShip alienShip;
 	
 	//Game Status
 	private int score1 = 0;
@@ -47,18 +59,47 @@ public class Asteroids{
 	private boolean isSinglePlayer = true;
 	
 	private void gameInit(){
-		if (isSinglePlayer){
-			player1 = new Player(500,500, 0);
-			player2 = null;
-		}else{
-			player1 = new Player(250, 500, 0);
-			player2 = new Player(750, 500, 1);
-		}
-		keyChecker = KeyChecker.getInstance();
-		paused = false;
 		score1 = 0;
 		score2 = 0;
 		level = startingLevel;
+		if (isSinglePlayer){
+			player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,0);
+			player2 = null;
+		}else{
+			player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,0);
+			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
+		}
+		initAsteroids();
+		alienShip = new AlienShip(100,100,0,0,0,0);
+		paused = false;
+		
+	}
+	public void initAsteroids(){
+		asteroids = new ArrayList<Asteroid>();
+		int randX;
+		int randY;
+		for (int i = 0; i < level + 2; i++){
+			if (player2 != null){
+				do{
+					randX = (int)(Math.random()*screenWidth);
+				}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100)&&(randX > player2.getX()-100)&&(randX < player2.getX()+100));
+				do{
+					randY = (int)(Math.random()*screenHeight);
+				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100)&&(randY > player2.getY()-100)&&(randX < player2.getY()+100));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+			}else{
+				do{
+					randX = (int)(Math.random()*screenWidth);
+				}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100));
+				do{
+					randY = (int)(Math.random()*screenHeight);
+				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100));
+				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random()));
+			}
+		}
+	}
+	public Asteroids(){
+		keyChecker = KeyChecker.createInstance(this);
 	}
 	public static void main(String [] argv){
 		new Asteroids().start();
@@ -88,9 +129,7 @@ public class Asteroids{
 					if (paused){
 					
 					}else{
-						player1.update();
-						if (player2 != null)
-							player2.update();
+						updateObjects();
 					}
 					canvas.update();
 					try{
@@ -103,13 +142,61 @@ public class Asteroids{
 		}
 	}
 	
+	public void updateObjects(){
+		player1.update();
+		if (player2 != null)
+			player2.update();
+		for (Asteroid asteroid:asteroids)
+			asteroid.update();
+		if (rogueSpaceship != null)
+			rogueSpaceship.update();
+		if (alienShip != null)
+			alienShip.update();
+		
+		for (Asteroid asteroid:asteroids) {
+			MovingObjectModel astModel = asteroid.model;
+			MovingObjectModel player1Model = player1.model;
+			if (astModel.collidesWith(player1Model)) {
+				// player 1 has hit an asteroid
+			}
+			if (player2 != null) {
+				MovingObjectModel player2Model = player2.model;
+				if (astModel.collidesWith(player2Model)) {
+					// player 2 has hit an asteroid
+				}
+			}
+		}
+		
+		
+	}
+	
 	public static boolean isPaused(){
 		return paused;
 	}
-	public static void togglePaused(){
+	public void togglePaused(){
 		paused = !paused;
 		if (paused)
-			MovingObjectModel.setPlaying(false);
+			pauseObjects();
+	}
+	public void pauseObjects(){
+		if (player1 != null)
+			player1.pause();
+		if (player2 != null)
+			player2.pause();
+		for (Asteroid asteroid: asteroids)
+			asteroid.pause();
+	}
+	public static int getScreenWidth(){
+		return screenWidth;
+	}
+	public static int getScreenHeight(){
+		return screenHeight;
+	}
+	public static int []getScreenDims(){
+		int []dims = new int[2];
+		dims[0] = screenWidth;
+		dims[1] = screenHeight;
+		return dims;
 	}
 	private class MyCanvas extends Canvas implements MouseListener{
 		private Font pauseFont;
@@ -134,6 +221,9 @@ public class Asteroids{
 			optionsTextAreas = new Rectangle[10];
 		}
 		private void initClickAreas(){
+			screenWidth = getWidth();
+			screenHeight = getHeight();
+			
 			fm = getBufferStrategy().getDrawGraphics().getFontMetrics(pauseFont);
 			int lineHeight = fm.getAscent()+fm.getDescent();
 			//Main Menu
@@ -176,9 +266,15 @@ public class Asteroids{
 				return;
 			if (gravExists && gravVisible)
 				drawGravObject(g);
-			player1.paint(g, getWidth(), getHeight());
+			player1.paint(g);
 			if (player2 != null)
-				player2.paint(g,  getWidth(), getHeight());
+				player2.paint(g);
+			if (rogueSpaceship != null)
+				rogueSpaceship.paint(g);
+			if (alienShip != null)
+				alienShip.paint(g);
+			for (Asteroid asteroid:asteroids)
+				asteroid.paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));
 			g.setColor(Color.WHITE);
 			g.drawString(""+score1, 40,40);

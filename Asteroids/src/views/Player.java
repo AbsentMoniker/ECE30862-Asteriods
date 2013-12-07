@@ -1,4 +1,4 @@
-package Views;
+package views;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -7,40 +7,25 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
-import Models.PlayerModel;
-import Models.Updatable;
+import models.PlayerModel;
+import models.Updatable;
 
-public class Player implements Updatable {
 
-	private PlayerModel model;
+public class Player extends BaseView implements Updatable {
+
 	private int playerNo;
 	
-	public Player(int startX, int startY, int playerNo){
-		model = new PlayerModel(playerNo);
+	public Player(int x, int y, int angle, double vx, double vy, double vAngle, int playerNo){
+		model = new PlayerModel(x, y, angle, vx, vy, vAngle, playerNo);
 		this.playerNo = playerNo;
-	}
-	@Override
-	public void update() {
-		model.update();
-	}
-	
-	public void paint(Graphics2D g, int width, int height){
 		if (playerNo == 0)
-			g.setColor(Color.white);
+			color = Color.WHITE;
 		else
-			g.setColor(Color.blue);
-		GeneralPath shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-		double [] pos = model.getPosition();
-		pos[0]*= width/100;
-		pos[1]*= height/100;
-		shape.moveTo(pos[0], pos[1]+20);
-		shape.lineTo(pos[0]+10, pos[1]-20);
-		shape.lineTo(pos[0]-10, pos[1]-20);
+			color = Color.blue;
+		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
+		shape.moveTo(0, 20);
+		shape.lineTo(10, -20);
+		shape.lineTo(-10, -20);
 		shape.closePath();
-		AffineTransform at = new AffineTransform();
-		at.rotate(model.getOrientation(),pos[0],pos[1]);
-		shape.transform(at);
-		g.draw(shape);
 	}
-
 }

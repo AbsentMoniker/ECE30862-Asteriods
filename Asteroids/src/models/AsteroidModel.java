@@ -6,5 +6,6 @@ public class AsteroidModel extends MovingObjectModel implements Updatable {
 		super(x, y, angle, vx, vy, vAngle);
 		acc[0] = 0;
 		acc[1] = 0;
+		hitRad = 50;
 	}
 }
