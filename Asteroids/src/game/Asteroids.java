@@ -56,14 +56,14 @@ public class Asteroids{
 	
 	private void gameInit(){
 		if (isSinglePlayer){
-			player1 = new Player(500,500, 0);
+			player1 = new Player(screenWidth/2,screenHeight/2, 0,0,0,0,0);
 			player2 = null;
 		}else{
-			player1 = new Player(250, 500, 0);
-			player2 = new Player(750, 500, 1);
+			player1 = new Player(screenWidth/4, screenHeight/2, 0,0,0,0,0);
+			player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,1);
 		}
 		asteroids = new ArrayList<Asteroid>();
-		asteroids.add(new Asteroid(500,500,3,3,0,1));
+		asteroids.add(new Asteroid(500,500,0,3,4,1));
 		keyChecker = KeyChecker.getInstance();
 		paused = false;
 		score1 = 0;
@@ -101,6 +101,8 @@ public class Asteroids{
 						player1.update();
 						if (player2 != null)
 							player2.update();
+						for (Asteroid asteroid:asteroids)
+							asteroid.update();
 					}
 					canvas.update();
 					try{

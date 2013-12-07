@@ -19,9 +19,13 @@ public abstract class MovingObjectModel implements Updatable {
 	// nanosecond time when model was last updated
 	protected long lastUpdate = 0;
 
-	public MovingObjectModel(){
-		pos[0] = 50;
-		pos[1] = 50;
+	public MovingObjectModel(int x, int y, int angle, int vx, int vy, int vAngle){
+		pos[0] = x;
+		pos[1] = y;
+		rotPos = angle;
+		vel[0] = vx;
+		vel[1] = vy;
+		rotVel = vAngle;
 	}
 	public void update() {
 		if (playing == false) {

@@ -13,8 +13,8 @@ public class Asteroid extends BaseView implements Updatable {
 	private static final int VERTICES = 30;
 	int health = 2;
 	
-	public Asteroid(int startX, int startY, int startVX, int startVY, int startAngle, int startAngleVelocity){
-		model = new AsteroidModel();
+	public Asteroid(int x, int y, int angle, int vx, int vy, int vAngle){
+		model = new AsteroidModel(x, y, angle, vx, vy, vAngle);
 		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD,VERTICES);
 		Random rand = new Random();
 		shape.moveTo(0, RADIUS+rand.nextInt(14)-6);
