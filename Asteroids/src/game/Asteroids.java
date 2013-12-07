@@ -44,7 +44,7 @@ import models.MovingObjectModel;
 public class Asteroids{
 	public static int screenWidth;
 	public static int screenHeight;
-	
+	public static final String HIGHSCOREFILE = "scores.config";
 	//Game Objects
 	private Player player1;
 	private Player player2;
@@ -287,6 +287,10 @@ public class Asteroids{
 			return false;
 		}
 		return true;
+	}
+	public void exit(){
+		//Write new high scores
+		System.exit(0);
 	}
 	public void initAsteroids(){
 		asteroids = new ArrayList<Asteroid>();
@@ -763,7 +767,7 @@ public class Asteroids{
 				}else if (mainMenuTextAreas[3].contains(e.getLocationOnScreen())){//High Scores
 					
 				}else if (mainMenuTextAreas[4].contains(e.getLocationOnScreen())){//Quit
-					System.exit(0);
+					exit();
 				}
 			}else if(paused){
 				if (pauseTextAreas[0].contains(e.getLocationOnScreen())){//Continue
