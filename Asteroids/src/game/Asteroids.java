@@ -105,6 +105,9 @@ public class Asteroids{
 			return false;
 		}
 		try{
+			asteroids = new ArrayList<Asteroid>();
+			bullets = new ArrayList<Bullet>();
+			
 			//write status
 			score1 = file.readInt();
 			score2 = file.readInt();
@@ -134,44 +137,58 @@ public class Asteroids{
 				newX = file.readInt();
 				newY = file.readInt();
 				newAngle = file.readDouble();
-				newVX.readDouble();
-				newVY.readDouble();
-				newVAngle.readDouble();
-				newLives.readInt();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				newLives = file.readInt();
 				player2 = new Player(newX,newY,newAngle,newVX,newVY,newVAngle,newLives,1);
 			}
-			file.writeInt(asteroids.size());
-			for (Asteroid asteroid:asteroids){
-				file.writeInt(asteroid.getX());
-				file.writeInt(asteroid.getY());
-				file.writeInt(asteroid.getAngle());
-				file.writeDouble(asteroid.getVX());
-				file.writeDouble(asteroid.getVY());
-				file.writeDouble(asteroid.getVAngle());
+			status = file.readInt();
+			for (int i = 0; i < status; i++){
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				Color newColor = new Color(file.readInt());
+				//TODO: add distance remaining to travel
+				bullets.add(new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor));
 			}
-			if (rogueSpaceship == null){
-				file.writeInt(0);
-			}else{
-				file.writeInt(1);
-				file.writeInt(rogueSpaceship.getX());
-				file.writeInt(rogueSpaceship.getY());
-				file.writeInt(rogueSpaceship.getAngle());
-				file.writeDouble(rogueSpaceship.getVX());
-				file.writeDouble(rogueSpaceship.getVY());
-				file.writeDouble(rogueSpaceship.getVAngle());
-				file.writeInt(rogueSpaceship.getLives());
+			status = file.readInt();
+			for (int i = 0; i < status; i++){
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				asteroids.add(new Asteroid(newX, newY, newAngle, newVX, newVY, newVAngle));
 			}
-			if (alienShip == null){
-				file.writeInt(0);
+			status = file.readInt();
+			if (status == 0){
+				rogueSpaceship = null;
 			}else{
-				file.writeInt(1);
-				file.writeInt(alienShip.getX());
-				file.writeInt(alienShip.getY());
-				file.writeInt(alienShip.getAngle());
-				file.writeDouble(alienShip.getVX());
-				file.writeDouble(alienShip.getVY());
-				file.writeDouble(alienShip.getVAngle());
-				file.writeInt(alienShip.getLives());
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				rogueSpaceship = new RogueSpaceship(newX,newY,newAngle,newVX,newVY,newVAngle);
+			}
+			status = file.readInt();
+			if (status == 0){
+				alienShip = null;
+			}else{
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readInt();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				newLives = file.readInt();
+				alienShip = new AlienShip(newX,newY,newAngle,newVX,newVY,newVAngle,newLives);
 			}
 			file.close();
 		}catch (IOException ex){
@@ -228,6 +245,7 @@ public class Asteroids{
 				file.writeDouble(bullet.getVX());
 				file.writeDouble(bullet.getVY());
 				file.writeDouble(bullet.getVAngle());
+				file.writeInt(bullet.getColor().getRGB());
 			}
 			file.writeInt(asteroids.size());
 			for (Asteroid asteroid:asteroids){
@@ -248,7 +266,6 @@ public class Asteroids{
 				file.writeDouble(rogueSpaceship.getVX());
 				file.writeDouble(rogueSpaceship.getVY());
 				file.writeDouble(rogueSpaceship.getVAngle());
-				file.writeInt(rogueSpaceship.getLives());
 			}
 			if (alienShip == null){
 				file.writeInt(0);
