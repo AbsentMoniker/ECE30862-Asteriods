@@ -79,8 +79,25 @@ public abstract class MovingObjectModel implements Updatable {
 		return rotPos;
 	}
 	
+	public final double[] getVelocity() {
+		return vel.clone();
+	}
+	
+	public final double getRotVel() {
+		return rotVel;
+	}
+	
 	public final void setPlaying(boolean newPlaying){
 		playing = newPlaying;
+	}
+	
+	// overridden by subclasses that want to
+	public int getLives() {
+		return 0;
+	}
+	
+	public boolean decrementLives() {
+		return true;
 	}
 	
 	public String toString() {
