@@ -27,13 +27,14 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	// number of remaining lives
 	private int lives = 3;
 	
-	public PlayerModel(int x, int y, double angle, double vx, double vy, double vAngle, int playerNum) {
+	public PlayerModel(int x, int y, double angle, double vx, double vy, double vAngle, int numLives, int playerNum) {
 		super(x, y, angle, vx, vy, vAngle);
 		System.out.println("Player model " + playerNum + " instantiated");
 		player = playerNum;
 		keyChecker = KeyChecker.getInstance();
 		hitRad = 10;
 		lastBullet = System.nanoTime();
+		lives = numLives;
 	}
 	
 	@Override

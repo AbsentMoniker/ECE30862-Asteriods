@@ -7,8 +7,7 @@ import models.BulletModel;
 import models.Updatable;
 
 public class Bullet extends BaseView implements Updatable {
-	public Bullet(int x, int y, double angle, double vx, double vy,
-			int vAngle, Color bulletColor) {
+	public Bullet(int x, int y, double angle, double vx, double vy, double vAngle, Color bulletColor){
 		model = new BulletModel(x,y,angle,vx,vy,vAngle);
 		color = bulletColor;
 		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 4);

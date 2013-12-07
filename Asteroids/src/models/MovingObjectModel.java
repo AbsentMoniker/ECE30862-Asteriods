@@ -21,6 +21,8 @@ public abstract class MovingObjectModel implements Updatable {
 	protected double hitRad = 0;
 	// distance object has traveled in points
 	protected double dist = 0;
+	// lives
+	protected int lives = 0;
 
 	public MovingObjectModel(int x, int y, double angle, double vx, double vy, double vAngle){
 		pos[0] = x;
@@ -98,7 +100,7 @@ public abstract class MovingObjectModel implements Updatable {
 	
 	// overridden by subclasses that want to
 	public int getLives() {
-		return 0;
+		return lives;
 	}
 	
 	public boolean decrementLives() {

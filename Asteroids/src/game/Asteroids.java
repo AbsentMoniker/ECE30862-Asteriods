@@ -45,7 +45,7 @@ import models.PlayerModel;
 public class Asteroids{
 	public static int screenWidth;
 	public static int screenHeight;
-	
+	public static final String HIGHSCOREFILE = "scores.config";
 	//Game Objects
 	private Player player1;
 	private Player player2;
@@ -64,6 +64,8 @@ public class Asteroids{
 	private KeyChecker keyChecker;
 	
 	private boolean inMainMenu = true;
+	private boolean gameLoaded = false;
+	
 	//options
 	private boolean gravExists = false;
 	private boolean gravVisible = false;
@@ -108,6 +110,9 @@ public class Asteroids{
 		}
 		/*
 		try{
+			asteroids = new ArrayList<Asteroid>();
+			bullets = new ArrayList<Bullet>();
+			
 			//write status
 			score1 = file.readInt();
 			score2 = file.readInt();
@@ -137,44 +142,58 @@ public class Asteroids{
 				newX = file.readInt();
 				newY = file.readInt();
 				newAngle = file.readDouble();
-				newVX.readDouble();
-				newVY.readDouble();
-				newVAngle.readDouble();
-				newLives.readInt();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				newLives = file.readInt();
 				player2 = new Player(newX,newY,newAngle,newVX,newVY,newVAngle,newLives,1);
 			}
-			file.writeInt(asteroids.size());
-			for (Asteroid asteroid:asteroids){
-				file.writeInt(asteroid.getX());
-				file.writeInt(asteroid.getY());
-				file.writeInt(asteroid.getAngle());
-				file.writeDouble(asteroid.getVX());
-				file.writeDouble(asteroid.getVY());
-				file.writeDouble(asteroid.getVAngle());
+			status = file.readInt();
+			for (int i = 0; i < status; i++){
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				Color newColor = new Color(file.readInt());
+				//TODO: add distance remaining to travel
+				bullets.add(new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor));
 			}
-			if (rogueSpaceship == null){
-				file.writeInt(0);
-			}else{
-				file.writeInt(1);
-				file.writeInt(rogueSpaceship.getX());
-				file.writeInt(rogueSpaceship.getY());
-				file.writeInt(rogueSpaceship.getAngle());
-				file.writeDouble(rogueSpaceship.getVX());
-				file.writeDouble(rogueSpaceship.getVY());
-				file.writeDouble(rogueSpaceship.getVAngle());
-				file.writeInt(rogueSpaceship.getLives());
+			status = file.readInt();
+			for (int i = 0; i < status; i++){
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				asteroids.add(new Asteroid(newX, newY, newAngle, newVX, newVY, newVAngle));
 			}
-			if (alienShip == null){
-				file.writeInt(0);
+			status = file.readInt();
+			if (status == 0){
+				rogueSpaceship = null;
 			}else{
-				file.writeInt(1);
-				file.writeInt(alienShip.getX());
-				file.writeInt(alienShip.getY());
-				file.writeInt(alienShip.getAngle());
-				file.writeDouble(alienShip.getVX());
-				file.writeDouble(alienShip.getVY());
-				file.writeDouble(alienShip.getVAngle());
-				file.writeInt(alienShip.getLives());
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readDouble();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				rogueSpaceship = new RogueSpaceship(newX,newY,newAngle,newVX,newVY,newVAngle);
+			}
+			status = file.readInt();
+			if (status == 0){
+				alienShip = null;
+			}else{
+				newX = file.readInt();
+				newY = file.readInt();
+				newAngle = file.readInt();
+				newVX = file.readDouble();
+				newVY = file.readDouble();
+				newVAngle = file.readDouble();
+				newLives = file.readInt();
+				alienShip = new AlienShip(newX,newY,newAngle,newVX,newVY,newVAngle,newLives);
 			}
 			file.close();
 		}catch (IOException ex){
@@ -232,6 +251,7 @@ public class Asteroids{
 				file.writeDouble(bullet.getVX());
 				file.writeDouble(bullet.getVY());
 				file.writeDouble(bullet.getVAngle());
+				file.writeInt(bullet.getColor().getRGB());
 			}
 			file.writeInt(asteroids.size());
 			for (Asteroid asteroid:asteroids){
@@ -252,7 +272,6 @@ public class Asteroids{
 				file.writeDouble(rogueSpaceship.getVX());
 				file.writeDouble(rogueSpaceship.getVY());
 				file.writeDouble(rogueSpaceship.getVAngle());
-				file.writeInt(rogueSpaceship.getLives());
 			}
 			if (alienShip == null){
 				file.writeInt(0);
@@ -272,6 +291,10 @@ public class Asteroids{
 			return false;
 		}
 		return true;
+	}
+	public void exit(){
+		//Write new high scores
+		System.exit(0);
 	}
 	public void initAsteroids(){
 		asteroids = new ArrayList<Asteroid>();
@@ -323,7 +346,10 @@ public class Asteroids{
 					canvas.update();
 				}
 				//Game loop
-				gameInit();
+				if (gameLoaded)
+					gameLoaded = false;
+				else
+					gameInit();
 				while (!inMainMenu){
 					if (paused){
 					
@@ -752,19 +778,24 @@ public class Asteroids{
 				if (mainMenuTextAreas[0].contains(e.getLocationOnScreen())){//Play
 					inMainMenu = false;
 				}else if (mainMenuTextAreas[1].contains(e.getLocationOnScreen())){//Load
-					final JFileChooser fc = new JFileChooser();
+					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
 					int returnVal = fc.showOpenDialog(this);
 					if (returnVal == JFileChooser.APPROVE_OPTION){
 						File openFile = fc.getSelectedFile();
-						gameInitFromFile(openFile);
+						boolean result = gameInitFromFile(openFile);
+						if (result){
+							gameLoaded = true;
+							inMainMenu = false;
+						}
 					}
+					
 				}else if (mainMenuTextAreas[2].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (mainMenuTextAreas[3].contains(e.getLocationOnScreen())){//High Scores
 					
 				}else if (mainMenuTextAreas[4].contains(e.getLocationOnScreen())){//Quit
-					System.exit(0);
+					exit();
 				}
 			}else if(paused){
 				if (pauseTextAreas[0].contains(e.getLocationOnScreen())){//Continue
@@ -778,7 +809,13 @@ public class Asteroids{
 						saveGame(saveFile);
 					}
 				}else if (pauseTextAreas[2].contains(e.getLocationOnScreen())){//Open
-					System.out.println("OPEN CLICKED");
+					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
+					int returnVal = fc.showOpenDialog(this);
+					if (returnVal == JFileChooser.APPROVE_OPTION){
+						File openFile = fc.getSelectedFile();
+						gameInitFromFile(openFile);
+					}
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (pauseTextAreas[4].contains(e.getLocationOnScreen())){//Exit Game

@@ -53,6 +53,10 @@ public abstract class BaseView implements Updatable{
 	public double getVAngle(){
 		return model.getRotVel();
 	}
+
+	public Color getColor(){
+		return color;
+	}
 	public int getLives() {
 		return model.getLives();
 	}
