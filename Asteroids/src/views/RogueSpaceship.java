@@ -11,9 +11,10 @@ public class RogueSpaceship extends BaseView implements Updatable {
 		model = new RogueSpaceshipModel(x,y,angle,vx,vy,vAngle);
 		color = Color.red;
 		shape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
-		shape.moveTo(0, 20);
-		shape.lineTo(10, -20);
-		shape.lineTo(-10, -20);
+		shape.moveTo(0, 14);
+		shape.lineTo(14, -14);
+		shape.lineTo(0, -5);
+		shape.lineTo(-14, -14);
 		shape.closePath();
 	}
 }
