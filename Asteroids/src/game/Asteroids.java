@@ -39,6 +39,7 @@ import views.RogueSpaceship;
 
 import models.KeyChecker;
 import models.MovingObjectModel;
+import models.PlayerModel;
 
 
 public class Asteroids{
@@ -95,6 +96,7 @@ public class Asteroids{
 		rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
 		alienShip = new AlienShip(600,600,0,0,0,0);
 		initAsteroids();
+		bullets = new ArrayList<Bullet>();
 		paused = false;	
 	}
 	private boolean gameInitFromFile(File fin){
@@ -104,6 +106,7 @@ public class Asteroids{
 		}catch (FileNotFoundException ex){
 			return false;
 		}
+		/*
 		try{
 			//write status
 			score1 = file.readInt();
@@ -177,6 +180,7 @@ public class Asteroids{
 		}catch (IOException ex){
 			return false;
 		}
+		*/
 		return true;
 	}
 	private boolean saveGame(File fout){
@@ -362,6 +366,17 @@ public class Asteroids{
 					// player 2 has hit an asteroid
 				}
 			}
+		}
+		
+		// spawn bullet for P1
+		PlayerModel p1Model = (PlayerModel)player1.model;
+		if (p1Model.firesBullet()) {
+			System.out.println("Trying to fire bullet");
+			Bullet newBullet;
+			double[] bPos = p1Model.bulletPos();
+			double[] bVel = p1Model.bulletVel();
+			newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
+			bullets.add(newBullet);
 		}
 	}
 	
