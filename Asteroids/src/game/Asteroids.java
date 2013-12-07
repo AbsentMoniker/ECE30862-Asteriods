@@ -376,7 +376,7 @@ public class Asteroids{
 		}
 	}
 	public void addHighScore(){
-		
+		//TODO: implement this!
 	}
 	public void start(){
 		DisplayMode displayMode = new DisplayMode(100,100,16,75);
@@ -571,6 +571,7 @@ public class Asteroids{
 		private Rectangle[] mainMenuTextAreas;
 		private Rectangle[] pauseTextAreas;
 		private Rectangle[] optionsTextAreas;
+		private Rectangle highScoreTextArea;
 		
 		public MyCanvas(){
 			setBackground(Color.BLACK);
@@ -604,6 +605,8 @@ public class Asteroids{
 			pauseTextAreas[2] = new Rectangle((getWidth()-fm.stringWidth("Open"))/2, 450-lineHeight/2, fm.stringWidth("Open"),lineHeight);
 			pauseTextAreas[3] = new Rectangle((getWidth()-fm.stringWidth("Options"))/2, 550-lineHeight/2, fm.stringWidth("Options"),lineHeight);
 			pauseTextAreas[4] = new Rectangle((getWidth()-fm.stringWidth("Exit Game"))/2, 650-lineHeight/2, fm.stringWidth("Exit Game"),lineHeight);
+		
+			highScoreTextArea = new Rectangle((getWidth()-fm.stringWidth("Done"))/2, getHeight()-fm.getHeight()-20-lineHeight/2,fm.stringWidth("Done"), lineHeight);
 		}
 		
 		public void update(){
@@ -723,7 +726,9 @@ public class Asteroids{
 		}
 		private void paintMainMenu(Graphics2D g){
 			g.setFont(menuFont);
-			if (inOptions){
+			if (inHighScores){
+				drawHighScores(g);
+			}else if (inOptions){
 				drawOptions(g);
 			}else{
 				drawMenu(g);
@@ -901,8 +906,26 @@ public class Asteroids{
 				g.setColor(Color.WHITE);
 			g.drawString(current, (getWidth()-fm.stringWidth(current))/2, 725);
 		}
+		private void drawHighScores(Graphics2D g){
+			g.setColor(Color.white);
+			g.drawString("HIGH SCORES", (getWidth()-fm.stringWidth("HIGH SCORES"))/2, 100);
+			if (highScores.size() == 0){
+				g.drawString("No Scores Added!", (getWidth()-fm.stringWidth("No Scores Added!"))/2, getHeight()/2);
+			}else{
+				for (int i = 0; i < highScores.size();i++){
+					g.drawString(""+(i+1)+") "+highScoreNames.get(i), getWidth()/4, 200+60*i);
+					g.drawString(""+highScoreNames.get(i), getWidth()*3/4, 200+60*i);
+				}
+			}
+			if (highScoreTextArea.contains(MouseInfo.getPointerInfo().getLocation()))
+				g.setColor(Color.RED);
+			g.drawString("Done", (getWidth()-fm.stringWidth("Done"))/2, getHeight()-fm.getHeight()-20);
+		}
 		public void mouseClicked(MouseEvent e){
-			if (inOptions){
+			if (inHighScores){
+				if (highScoreTextArea.contains(e.getLocationOnScreen()))
+					inHighScores = false;
+			}else if (inOptions){
 				if (optionsTextAreas[0].contains(e.getLocationOnScreen())){//Grav Exists
 					gravExists = !gravExists;
 				}else if (optionsTextAreas[1].contains(e.getLocationOnScreen()) && gravExists){//Grav Visible
@@ -914,7 +937,8 @@ public class Asteroids{
 				}else if (optionsTextAreas[4].contains(e.getLocationOnScreen())){//Asteroid Number -
 					numAsteroids = numAsteroids == 1 ? 1 : numAsteroids-1;
 				}else if (optionsTextAreas[5].contains(e.getLocationOnScreen())){//Reset high Score
-					
+					highScoreNames = new ArrayList<String>();
+					highScores = new ArrayList<Integer>();
 				}else if (optionsTextAreas[6].contains(e.getLocationOnScreen())){//Start Level +
 					startingLevel++;
 				}else if (optionsTextAreas[7].contains(e.getLocationOnScreen())){//Start Level -
@@ -943,7 +967,7 @@ public class Asteroids{
 				}else if (mainMenuTextAreas[2].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (mainMenuTextAreas[3].contains(e.getLocationOnScreen())){//High Scores
-					
+					inHighScores = true;
 				}else if (mainMenuTextAreas[4].contains(e.getLocationOnScreen())){//Quit
 					exit();
 				}
