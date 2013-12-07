@@ -351,6 +351,8 @@ public class Asteroids{
 			rogueSpaceship.update();
 		if (alienShip != null)
 			alienShip.update();
+		
+//		Iterator<Bullet>
 		for (Bullet bullet:bullets)
 			bullet.update();
 		for (Asteroid asteroid:asteroids) {
@@ -371,12 +373,23 @@ public class Asteroids{
 		// spawn bullet for P1
 		PlayerModel p1Model = (PlayerModel)player1.model;
 		if (p1Model.firesBullet()) {
-			System.out.println("Trying to fire bullet");
 			Bullet newBullet;
 			double[] bPos = p1Model.bulletPos();
 			double[] bVel = p1Model.bulletVel();
 			newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
 			bullets.add(newBullet);
+		}
+		
+		if (player2 != null) {
+			// spawn bullet for P1
+			PlayerModel p2Model = (PlayerModel)player2.model;
+			if (p2Model.firesBullet()) {
+				Bullet newBullet;
+				double[] bPos = p2Model.bulletPos();
+				double[] bVel = p2Model.bulletVel();
+				newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
+				bullets.add(newBullet);
+			}
 		}
 	}
 	
