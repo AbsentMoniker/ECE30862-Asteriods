@@ -41,4 +41,16 @@ public abstract class BaseView implements Updatable{
 	public int getY(){
 		return (int)model.getPosition()[1];
 	}
+	public double getAngle(){
+		return model.getOrientation();
+	}
+	public double getVX(){
+		return model.getVelocity()[0];
+	}
+	public double getVY(){
+		return model.getVelocity()[1];
+	}
+	public double getVAngle(){
+		return model.getRotVel();
+	}
 }
