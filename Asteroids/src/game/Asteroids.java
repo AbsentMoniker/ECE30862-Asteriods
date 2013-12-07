@@ -183,9 +183,9 @@ public class Asteroids{
 				return;
 			if (gravExists && gravVisible)
 				drawGravObject(g);
-			player1.paint(g, getWidth(), getHeight());
+			player1.paint(g);
 			if (player2 != null)
-				player2.paint(g,  getWidth(), getHeight());
+				player2.paint(g);
 			g.setColor(Color.WHITE);
 			for (Asteroid asteroid:asteroids)
 				asteroid.paint(g);
