@@ -543,6 +543,7 @@ public class Asteroids{
 					gameInit();
 				int alienTime = 0;
 				int rogueTime = 0;
+				int alienShootTime = 0;
 				while (!inMainMenu){
 					if (paused){
 					
@@ -574,11 +575,25 @@ public class Asteroids{
 						Thread.sleep(15);
 					}catch (InterruptedException ex){}
 					alienTime += 15;
+					alienShootTime += 15;
 					rogueTime += 15;
-					if (alienTime >= 10000){
+					if (alienTime >= 100){
 						alienTime = 0;
 						if (alienShip == null){
 							alienShip = new AlienShip(0, (int)(getScreenHeight()*Math.random()), 0.0, Math.random()*level*20+50, 0.0,0.0);
+						}
+					}
+					if (alienShip != null) {
+						if (alienShootTime == 1005) {
+							shootAtShips(alienShip);
+						} else if (alienShootTime == 1275) {
+							shootAtShips(alienShip);
+						} else if (alienShootTime == 1500) {
+							shootAtShips(alienShip);
+						} else if (alienShootTime == 1770) {
+							shootAtShips(alienShip);
+						} else if (alienShootTime >= 1995) {
+							alienShootTime = 0;
 						}
 					}
 					if (rogueTime >= 20000){
