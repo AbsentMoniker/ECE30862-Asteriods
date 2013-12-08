@@ -5,11 +5,11 @@ import game.Asteroids;;
 public class PlayerModel extends MovingObjectModel implements Updatable {
 	// CONSTANTS
 	// player acceleration constant, in points/s^2
-	private final double shipAcceleration = 80;
+	private final double shipAcceleration = 100;
 	// player rotation constant, in rad/s
 	private final double shipRotationSpeed = 2.5;
 	// bullet relative velocity
-	private final double bulletSpeed = 200;
+	private final double bulletSpeed = 230;
 	// player maximum speed
 	private final double maxSpeed = 500;
 	// gravity scale factor
@@ -22,6 +22,8 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	KeyChecker keyChecker;
 	// how long it's been since a print was issued
 	private long lastPrint = 0;
+	// whether ship is executing burn (i.e. acceleration)
+	private boolean isAccelerating = false;
 
 	// when last bullet was fired
 	private long lastBullet = 0;
@@ -51,13 +53,31 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		gravExists = exists;
 	}
 	
+	public void resetToStart(boolean twoPlayer) {
+		vel[0] = vel[1] = 0;
+		rotPos = rotVel = 0;
+		acc[0] = acc[1] = 0;
+		if (twoPlayer == false) {
+			pos[0] = Asteroids.getScreenWidth() / 2;
+			pos[1] = Asteroids.getScreenHeight() / 2;
+		} else if (player == 0) {
+			pos[0] = Asteroids.getScreenWidth() / 4;
+			pos[1] = Asteroids.getScreenHeight() / 2;
+		} else if (player == 1) {
+			pos[0] = (Asteroids.getScreenWidth() * 3) / 4;
+			pos[1] = Asteroids.getScreenHeight() / 2;
+		}
+	}
+	
 	@Override
 	public void update() {
 		if (keyChecker.getPlayerAccelerating(player)) {
 			acc[0] = -1 * Math.sin(rotPos) * shipAcceleration;
 			acc[1] = Math.cos(rotPos) * shipAcceleration;
+			isAccelerating = true;
 		} else {
 			acc[0] = acc[1] = 0;
+			isAccelerating = false;
 		}
 		
 		if (gravExists) {
@@ -77,7 +97,6 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 			
 			acc[0] += gravAccX;
 			acc[1] += gravAccY;
-			System.out.println("Full: " + gravAcc + " X: " + gravAccX);
 		}
 		
 		if (keyChecker.getPlayerDirection(player) == 'l') {
@@ -111,6 +130,10 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 		}
 	}
 	
+	public boolean isAccelerating() {
+		return isAccelerating;
+	}
+	
 	@Override
 	public int getLives() {
 		return lives;
@@ -135,8 +158,8 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	
 	public double[] bulletPos() {
 		double[] bPos = new double[2];
-		bPos[1] = Math.cos(rotPos) * hitRad + pos[1];
-		bPos[0] = -Math.sin(rotPos) * hitRad + pos[0];
+		bPos[1] = Math.cos(rotPos) * hitRad * 2.5 + pos[1];
+		bPos[0] = -Math.sin(rotPos) * hitRad * 2.5 + pos[0];
 		return bPos.clone();
 	}
 	

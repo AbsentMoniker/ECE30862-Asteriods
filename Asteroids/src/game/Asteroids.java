@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -38,10 +39,10 @@ import views.Asteroid;
 import views.Bullet;
 import views.Player;
 import views.RogueSpaceship;
-
 import models.KeyChecker;
 import models.MovingObjectModel;
 import models.PlayerModel;
+import game.SoundUtil;
 
 
 public class Asteroids{
@@ -55,11 +56,14 @@ public class Asteroids{
 	private ArrayList<Asteroid> asteroids;
 	private RogueSpaceship rogueSpaceship;
 	private AlienShip alienShip;
+	private SoundUtil soundUtil;
 	
 	//Game Status
 	private int score1 = 0;
 	private int score2 = 0;
 	private static boolean paused = false;
+	private boolean p1Alive = true;
+	private boolean p2Alive = true;
 
 	private int level = 1;
 
@@ -69,6 +73,9 @@ public class Asteroids{
 	private boolean gameLoaded = false;
 	private boolean inOptions = false;
 	private boolean inHighScores = false;
+	
+	// tuning
+	private final int asteroidSpeedScale = 20;
 	
 	//options
 	private boolean gravExists = false;
@@ -107,6 +114,8 @@ public class Asteroids{
 		initAsteroids();
 		bullets = new ArrayList<Bullet>();
 		paused = false;	
+		
+		soundUtil = new SoundUtil();
 	}
 	private boolean gameInitFromFile(File fin){
 		DataInputStream file;
@@ -164,7 +173,8 @@ public class Asteroids{
 				newVY = file.readDouble();
 				newVAngle = file.readDouble();
 				Color newColor = new Color(file.readInt());
-				Bullet newBullet = new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor);
+				int newShooterID = file.readInt();
+				Bullet newBullet = new Bullet(newX,newY,newAngle,newVX,newVY,newVAngle,newColor, newShooterID);
 				newBullet.setDist(file.readDouble());
 				bullets.add(newBullet);
 			}
@@ -260,6 +270,7 @@ public class Asteroids{
 				file.writeDouble(bullet.getVY());
 				file.writeDouble(bullet.getVAngle());
 				file.writeInt(bullet.getColor().getRGB());
+				file.writeInt(bullet.getShooter());
 				file.writeDouble(bullet.getDist());
 			}
 			file.writeInt(asteroids.size());
@@ -318,7 +329,10 @@ public class Asteroids{
 				do{
 					randY = (int)(Math.random()*screenHeight);
 				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100)&&(randY > player2.getY()-100)&&(randX < player2.getY()+100));
-				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random(),0));
+				asteroids.add(new Asteroid(randX,randY,0,
+						(Math.random() - .5)*asteroidSpeedScale*level,
+						(Math.random() - .5)*asteroidSpeedScale*level,
+						Math.random() - 0.5,0));
 			}else{
 				do{
 					randX = (int)(Math.random()*screenWidth);
@@ -326,7 +340,10 @@ public class Asteroids{
 				do{
 					randY = (int)(Math.random()*screenHeight);
 				}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100));
-				asteroids.add(new Asteroid(randX,randY,0,Math.random()*5*startingLevel,Math.random()*5*startingLevel,Math.random(),0));
+				asteroids.add(new Asteroid(randX,randY,0,
+						(Math.random() - .5)*asteroidSpeedScale*level,
+						(Math.random() - .5)*asteroidSpeedScale*level,
+						Math.random() - 0.5,0));
 			}
 		}
 	}
@@ -394,6 +411,9 @@ public class Asteroids{
 			
 			loadHighScores();
 			while (true){
+				// sound timer
+				int soundCounter = 0;
+				final int shipSoundSpacing = 20; 
 				//Menu Loop
 				while (inMainMenu){
 					canvas.update();
@@ -408,10 +428,30 @@ public class Asteroids{
 					
 					}else{
 						updateObjects();
+						soundCounter++;
+						if (soundCounter == shipSoundSpacing) {
+							PlayerModel p1Model = (PlayerModel)player1.model;
+							PlayerModel p2Model;
+							if (p1Model.isAccelerating() == true) {
+								soundUtil.playHighBeep();
+							} else {
+								if (player2 != null) {
+									p2Model = (PlayerModel)player2.model;
+									if (p2Model.isAccelerating() == true) {
+										soundUtil.playHighBeep();
+									} else {
+										soundUtil.playLowBeep();
+									}
+								} else {
+									soundUtil.playLowBeep();
+								}
+							}
+							soundCounter = 0;
+						}
 					}
 					canvas.update();
 					try{
-						Thread.sleep(20);
+						Thread.sleep(10);
 					}catch (InterruptedException ex){}
 				}
 			}
@@ -446,40 +486,70 @@ public class Asteroids{
 				it.remove();
 			}
 		}
-
+		// collidedWithCenter keeps track of whether *any* collisions have happened
+		// with asteroids, to prevent spawning player into an asteroid
+		boolean collidedWithCenter = false;
 		for (Asteroid asteroid:asteroids) {
 			MovingObjectModel astModel = asteroid.model;
-			MovingObjectModel player1Model = player1.model;
-			if (astModel.collidesWith(player1Model)) {
-				// TODO player 1 has hit an asteroid
-				//System.out.println("P1 hit an asteroid");
+			if (astModel.collidesWith(p1Model)) {
+				collidedWithCenter = true;
+				if (p1Alive == true) {
+					soundUtil.playExplosion();
+					// TODO player 1 has hit an asteroid
+					//System.out.println("P1 hit an asteroid");
+					if (p1Model.decrementLives() == true) {
+						// still lives remaining
+						p1Alive = false;
+						p1Model.resetToStart(!isSinglePlayer);
+					} else {
+						// TODO no lives remaining game over
+						inMainMenu = true;
+					}
+				}
 			}
 			if (player2 != null) {
-				MovingObjectModel player2Model = player2.model;
-				if (astModel.collidesWith(player2Model)) {
-					// TODO player 2 has hit an asteroid
+				if (astModel.collidesWith(p2Model)) {
+					collidedWithCenter = true;
+					if (p2Alive == true) {
+						soundUtil.playExplosion();
+						// player 2 has hit an asteroid
+						if (p2Model.decrementLives() == true) {
+							p2Alive = false;
+							p2Model.resetToStart(!isSinglePlayer);
+						} else {
+							inMainMenu = true;
+						}
+					}
 				}
 			}
 		}
 		
+		// respawn p1 and p2 only if they won't be insta-squished
+		if (p1Alive == false && collidedWithCenter == false) {
+			p1Alive = true;
+		}
+		if (player2 != null && p2Alive == false && collidedWithCenter == false) {
+			p2Alive = true;
+		}
+		
 		// spawn bullet for P1
 		
-		if (p1Model.firesBullet()) {
+		if (p1Model.firesBullet() && p1Alive == true) {
 			Bullet newBullet;
 			double[] bPos = p1Model.bulletPos();
 			double[] bVel = p1Model.bulletVel();
-			newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
+			newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white, 0);
 			bullets.add(newBullet);
 		}
 		
 
 		if (player2 != null) {
 			// spawn bullet for P2
-			if (p2Model.firesBullet()) {
+			if (p2Model.firesBullet() && p2Alive == true) {
 				Bullet newBullet;
 				double[] bPos = p2Model.bulletPos();
 				double[] bVel = p2Model.bulletVel();
-				newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white);
+				newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white, 1);
 				bullets.add(newBullet);
 			}
 		}
@@ -495,7 +565,12 @@ public class Asteroids{
 				Asteroid ast = aIt.next();
 				MovingObjectModel astModel = ast.model;
 				if (astModel.collidesWith(bModel)) {
-					// TODO spawn three small asteroids if this one was big
+					soundUtil.playExplosion();
+					if (b.getShooter() == 0) {
+						score1 += 5;
+					} else if (b.getShooter() == 1) {
+						score2 += 5;
+					}
 					astX = ast.getX();
 					astY = ast.getY();
 					astType = ast.getType();
@@ -505,24 +580,54 @@ public class Asteroids{
 					break;
 				}
 			}
-			if (collided && astType == 0) {
-				for (int i = 0; i < 3; i++) {
-					int newAstX = astX + (int)(Math.random() * 100 - 50);
-					int newAstY = astY + (int)(Math.random() * 100 - 50);
-					asteroids.add(new Asteroid(newAstX,newAstY,0,Math.random()*5*startingLevel,
-							Math.random()*5*startingLevel,Math.random(),1));
+			if (collided) {
+				if (astType == 0) {
+					for (int i = 0; i < 3; i++) {
+						int newAstX = astX + (int)(Math.random() * 100 - 50);
+						int newAstY = astY + (int)(Math.random() * 100 - 50);
+						asteroids.add(new Asteroid(newAstX,newAstY,0,
+								(Math.random() - .5)*asteroidSpeedScale*level,
+								(Math.random() - .5)*asteroidSpeedScale*level,
+								Math.random(),1));
+					}
+				}
+				if (asteroids.isEmpty()) {
+					score1 += level * 100;
+					score2 += level * 100;
+					level++;
+					initAsteroids();
 				}
 				continue;
 			}
 			
-			if (p1Model.collidesWith(bModel)) {
+			if (p1Model.collidesWith(bModel) && p1Alive) {
 				// TODO bullet hit p1
+				if (b.getShooter() == 1) {
+					score2 += 100;
+				}
+				
+				if (p1Model.decrementLives() == true) {
+					p1Alive = false;
+					p1Model.resetToStart(!isSinglePlayer);
+				} else {
+					inMainMenu = true;
+				}
 				continue;
 			}
 			
 			if (player2 != null) {
-				if (p2Model.collidesWith(bModel)) {
+				if (p2Model.collidesWith(bModel) && p2Alive) {
 					// TODO bullet hit p2
+					if (b.getShooter() == 0) {
+						score1 += 100;
+					}
+					
+					if (p2Model.decrementLives() == true) {
+						p2Alive = false;
+						p2Model.resetToStart(!isSinglePlayer);
+					} else {
+						inMainMenu = true;
+					}
 					continue;
 				}
 			}
@@ -531,7 +636,11 @@ public class Asteroids{
 				MovingObjectModel alienModel = alienShip.model;
 				if (alienModel.collidesWith(bModel)) {
 					// TODO bullet hit alien ship
-					System.out.println("Bullet hit alien");
+					if (b.getShooter() == 0) {
+						score1 += 100;
+					} else if (b.getShooter() == 1) {
+						score2 += 100;
+					}
 					boolean alienAlive = alienModel.decrementLives();
 					if (alienAlive == false) {
 						alienShip = null;
@@ -652,8 +761,9 @@ public class Asteroids{
 				return;
 			if (gravExists && gravVisible)
 				drawGravObject(g);
-			player1.paint(g);
-			if (player2 != null)
+			if (p1Alive == true)
+				player1.paint(g);
+			if (player2 != null && p2Alive == true)
 				player2.paint(g);
 			if (rogueSpaceship != null)
 				rogueSpaceship.paint(g);
@@ -969,6 +1079,8 @@ public class Asteroids{
 			}else if (inMainMenu){
 				if (mainMenuTextAreas[0].contains(e.getLocationOnScreen())){//Play
 					inMainMenu = false;
+					p1Alive = true;
+					p2Alive = true;
 				}else if (mainMenuTextAreas[1].contains(e.getLocationOnScreen())){//Load
 					final JFileChooser fc = new JFileChooser(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					fc.setFileFilter(new FileNameExtensionFilter("Saved Games (.asteroids)", "asteroids"));
