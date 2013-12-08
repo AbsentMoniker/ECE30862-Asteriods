@@ -667,8 +667,10 @@ public class Asteroids{
 	}
 	public void togglePaused(){
 		paused = !paused;
-		if (paused)
+		if (paused) {
 			pauseObjects();
+			numAsteroids = asteroids.size();
+		}
 	}
 	public void pauseObjects(){
 		if (player1 != null)
@@ -1062,8 +1064,23 @@ public class Asteroids{
 					unlimitedLives = !unlimitedLives;
 				}else if (optionsTextAreas[3].contains(e.getLocationOnScreen())){//Asteroid Number +
 					numAsteroids++;
+					int randX, randY;
+					do{
+						randX = (int)(Math.random()*screenWidth);
+					}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100)&&(randX > player2.getX()-100)&&(randX < player2.getX()+100));
+					do{
+						randY = (int)(Math.random()*screenHeight);
+					}while ((randY > player1.getY()-100)&&(randX < player1.getY()+100)&&(randY > player2.getY()-100)&&(randX < player2.getY()+100));
+					asteroids.add(new Asteroid(randX,randY,0,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							Math.random() - 0.5,0));
 				}else if (optionsTextAreas[4].contains(e.getLocationOnScreen())){//Asteroid Number -
-					numAsteroids = numAsteroids == 1 ? 1 : numAsteroids-1;
+					if (numAsteroids > 1) {
+						numAsteroids--;
+						Asteroid lastAst = asteroids.get(asteroids.size() - 1);
+						asteroids.remove(lastAst);
+					}
 				}else if (optionsTextAreas[5].contains(e.getLocationOnScreen())){//Reset high Score
 					highScoreNames = new ArrayList<String>();
 					highScores = new ArrayList<Integer>();
