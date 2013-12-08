@@ -42,6 +42,8 @@ import views.Asteroid;
 import views.Bullet;
 import views.Player;
 import views.RogueSpaceship;
+import views.BaseView;
+import models.AlienShipModel;
 import models.KeyChecker;
 import models.MovingObjectModel;
 import models.PlayerModel;
@@ -322,16 +324,17 @@ public class Asteroids{
 	}
 	public void initAsteroids(){
 		asteroids = new ArrayList<Asteroid>();
-		int randX;
-		int randY;
 		for (int i = 0; i < level + 2; i++){
+			int randX, randY;
+			double distTo1 = 0, distTo2 = 0;
 			if (player2 != null){
-				do{
+				do {
 					randX = (int)(Math.random()*screenWidth);
-				}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100)&&(randX > player2.getX()-100)&&(randX < player2.getX()+100));
-				do{
 					randY = (int)(Math.random()*screenHeight);
-				}while ((randY > player1.getY()-100)&&(randY < player1.getY()+100)&&(randY > player2.getY()-100)&&(randY < player2.getY()+100));
+					distTo1 = Math.sqrt( Math.pow(randX - player1.getX(), 2) + Math.pow(randY - player1.getY(), 2) );
+					distTo2 = Math.sqrt( Math.pow(randX - player2.getX(), 2) + Math.pow(randY - player2.getY(), 2) );
+				} while (distTo1 < 75 && distTo2 < 75);
+				
 				asteroids.add(new Asteroid(randX,randY,0,
 						(Math.random() - .5)*asteroidSpeedScale*level,
 						(Math.random() - .5)*asteroidSpeedScale*level,
@@ -343,6 +346,12 @@ public class Asteroids{
 				do{
 					randY = (int)(Math.random()*screenHeight);
 				}while ((randY > player1.getY()-100)&&(randY < player1.getY()+100));
+				do {
+					randX = (int)(Math.random()*screenWidth);
+					randY = (int)(Math.random()*screenHeight);
+					distTo1 = Math.sqrt( Math.pow(randX - player1.getX(), 2) + Math.pow(randY - player1.getY(), 2) );
+				} while (distTo1 < 75);
+				
 				asteroids.add(new Asteroid(randX,randY,0,
 						(Math.random() - .5)*asteroidSpeedScale*level,
 						(Math.random() - .5)*asteroidSpeedScale*level,
@@ -479,6 +488,31 @@ public class Asteroids{
 			}
 		}
 	}
+	
+	public void shootAtShips(BaseView v) {
+		AlienShipModel m = (AlienShipModel)v.model;
+		double tx, ty;
+		
+		if (player2 != null) {
+		if (Math.random() > 0.5) {
+			tx = player1.getX();
+			ty = player1.getY();
+		} else {
+			tx = player2.getX();
+			ty = player2.getY();
+		}
+		} else {
+			tx = player1.getX();
+			ty = player1.getY();
+		}
+		
+		
+		double[] bPos = m.bulletPos(tx, ty);
+		double[] bVel = m.bulletVel(tx, ty);
+		Bullet newBullet = new Bullet((int)bPos[0], (int)bPos[1], 0, bVel[0], bVel[1], 0, Color.white, 0);
+		bullets.add(newBullet);
+	}
+	
 	public void start(){
 		DisplayMode displayMode = new DisplayMode(100,100,16,75);
 		ScreenManager screen = new ScreenManager();
@@ -1162,13 +1196,15 @@ public class Asteroids{
 				}else if (optionsTextAreas[3].contains(e.getLocationOnScreen())){//Asteroid Number +
 					numAsteroids++;
 					int randX, randY;
+					double distTo1 = 0, distTo2 = 0;
 					if (player2 != null){
-						do{
+						do {
 							randX = (int)(Math.random()*screenWidth);
-						}while ((randX > player1.getX()-100)&&(randX < player1.getX()+100)&&(randX > player2.getX()-100)&&(randX < player2.getX()+100));
-						do{
 							randY = (int)(Math.random()*screenHeight);
-						}while ((randY > player1.getY()-100)&&(randY < player1.getY()+100)&&(randY > player2.getY()-100)&&(randY < player2.getY()+100));
+							distTo1 = Math.sqrt( Math.pow(randX - player1.getX(), 2) + Math.pow(randY - player1.getY(), 2) );
+							distTo2 = Math.sqrt( Math.pow(randX - player2.getX(), 2) + Math.pow(randY - player2.getY(), 2) );
+						} while (distTo1 < 75 && distTo2 < 75);
+						
 						asteroids.add(new Asteroid(randX,randY,0,
 								(Math.random() - .5)*asteroidSpeedScale*level,
 								(Math.random() - .5)*asteroidSpeedScale*level,
@@ -1180,6 +1216,12 @@ public class Asteroids{
 						do{
 							randY = (int)(Math.random()*screenHeight);
 						}while ((randY > player1.getY()-100)&&(randY < player1.getY()+100));
+						do {
+							randX = (int)(Math.random()*screenWidth);
+							randY = (int)(Math.random()*screenHeight);
+							distTo1 = Math.sqrt( Math.pow(randX - player1.getX(), 2) + Math.pow(randY - player1.getY(), 2) );
+						} while (distTo1 < 75);
+						
 						asteroids.add(new Asteroid(randX,randY,0,
 								(Math.random() - .5)*asteroidSpeedScale*level,
 								(Math.random() - .5)*asteroidSpeedScale*level,
