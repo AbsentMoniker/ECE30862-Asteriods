@@ -870,8 +870,8 @@ public class Asteroids{
 				alienShip.paint(g);
 			for (Bullet bullet:bullets)
 				bullet.paint(g);
-			for (Asteroid asteroid:asteroids)
-				asteroid.paint(g);
+			for (int i = 0; i < asteroids.size(); i++)
+				asteroids.get(i).paint(g);
 			g.setFont(new Font("Arial",Font.PLAIN,30));
 			g.setColor(Color.WHITE);
 			g.drawString(""+score1, 40,40);
@@ -1239,6 +1239,7 @@ public class Asteroids{
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
 					inOptions = true;
 				}else if (pauseTextAreas[4].contains(e.getLocationOnScreen())){//Exit Game
+					addHighScore();
 					inMainMenu = true;
 				}
 			}
