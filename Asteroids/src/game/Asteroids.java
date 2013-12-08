@@ -114,8 +114,8 @@ public class Asteroids{
 				player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,3,1);
 			}
 		}
-		//rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
-		//alienShip = new AlienShip(600,600,0,0,0,0);
+		rogueSpaceship = null;
+		alienShip = null;
 		initAsteroids();
 		bullets = new ArrayList<Bullet>();
 		paused = false;	
@@ -637,7 +637,16 @@ public class Asteroids{
 		// collidedWithCenter keeps track of whether *any* collisions have happened
 		// with asteroids, to prevent spawning player into an asteroid
 		boolean collidedWithCenter = false;
-		for (Asteroid asteroid:asteroids) {
+		boolean collided1 = false;
+		boolean collided2 = false;
+		int ast1X = 0;
+		int ast1Y = 0;
+		int ast1Type = 0;
+		int ast2X = 0;
+		int ast2Y = 0;
+		int ast2Type = 0;
+		for (Iterator<Asteroid> aIt = asteroids.iterator(); aIt.hasNext();) {
+			Asteroid asteroid = aIt.next();
 			MovingObjectModel astModel = asteroid.model;
 			if (astModel.collidesWith(p1Model)) {
 				collidedWithCenter = true;
@@ -648,6 +657,11 @@ public class Asteroids{
 					if (p1Model.decrementLives() == true) {
 						// still lives remaining
 						p1Alive = false;
+						collided1 = true;
+						aIt.remove();
+						ast1X = asteroid.getX();
+						ast1Y = asteroid.getY();
+						ast1Type = asteroid.getType();
 						p1Model.resetToStart(!isSinglePlayer);
 					} else {
 						addHighScore();
@@ -664,6 +678,11 @@ public class Asteroids{
 						// player 2 has hit an asteroid
 						if (p2Model.decrementLives() == true) {
 							p2Alive = false;
+							collided2 = true;
+							aIt.remove();
+							ast2X = asteroid.getX();
+							ast2Y = asteroid.getY();
+							ast2Type = asteroid.getType();
 							p2Model.resetToStart(!isSinglePlayer);
 						} else {
 							addHighScore();
@@ -674,7 +693,31 @@ public class Asteroids{
 				}
 			}
 		}
+		if (collided1){
+			if (ast1Type == 0) {
+				for (int i = 0; i < 3; i++) {
+					int newAstX = ast1X + (int)(Math.random() * 100 - 50);
+					int newAstY = ast1Y + (int)(Math.random() * 100 - 50);
+					asteroids.add(new Asteroid(newAstX,newAstY,0,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							Math.random(),1));
+				}
+			}
+		}
 		
+		if (collided2){
+			if (ast2Type == 0) {
+				for (int i = 0; i < 3; i++) {
+					int newAstX = ast2X + (int)(Math.random() * 100 - 50);
+					int newAstY = ast2Y + (int)(Math.random() * 100 - 50);
+					asteroids.add(new Asteroid(newAstX,newAstY,0,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							(Math.random() - .5)*asteroidSpeedScale*level,
+							Math.random(),1));
+				}
+			}
+		}
 		// respawn p1 and p2 only if they won't be insta-squished
 		if (p1Alive == false && collidedWithCenter == false) {
 			p1Alive = true;
