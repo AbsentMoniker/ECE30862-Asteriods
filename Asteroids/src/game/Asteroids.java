@@ -31,7 +31,10 @@ import java.util.Iterator;
 import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import views.AlienShip;
@@ -393,7 +396,88 @@ public class Asteroids{
 		}
 	}
 	public void addHighScore(){
-		//TODO: implement this!
+		int player;
+		int newScore;
+		if (score1 >= score2){
+			player = 1;
+			newScore = score1;
+		}else{
+			player = 2;
+			newScore = score2;
+		}
+		if ((highScores.size() == 10)&&(newScore < highScores.get(highScores.size()-1)))
+			return;
+		JPanel input = new JPanel();
+		input.add(new JLabel("HIGH SCORE FOR PLAYER "+ player+"!!!"));
+		input.add(new JLabel("Enter your name (only 5 letters will be used)"));
+		JTextField nameEntry = new JTextField(5);
+		input.add(nameEntry);
+		String [] button = {"OK"};
+		int result = JOptionPane.showOptionDialog(null,input,
+				"HIGH SCORE", JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,null, button, button[0]);
+		if (result == 0){
+			String name = nameEntry.getText();
+			if (name.length() > 5)
+				name = name.substring(0,5);
+			
+			//Determine location of new high score relative to current high scores
+			boolean added = false;
+			for (int i = 0; i < highScores.size(); i++){
+				if (newScore > highScores.get(i)){
+					highScores.add(i, newScore);
+					highScoreNames.add(i, name);
+					added = true;
+					break;
+				}
+			}
+			if (!added){
+				highScores.add(newScore);
+				highScoreNames.add(name);
+			}
+			if (highScores.size() > 10){
+				highScores.remove(10);
+				highScoreNames.remove(10);
+			}
+		}
+		
+		//Check other player
+		player = (player == 1) ? 2 : 1;
+		newScore = (newScore == score1) ? score2 : score1;
+		if ((player == 2)&&(player2 == null))
+			return;
+		if ((newScore < highScores.get(highScores.size()-1))&&(highScores.size() == 10))
+			return;
+		input = new JPanel();
+		input.add(new JLabel("HIGH SCORE FOR PLAYER "+ player+"!!!"));
+		input.add(new JLabel("Enter your name (only 5 letters will be used)"));
+		nameEntry = new JTextField(5);
+		input.add(nameEntry);
+		result = JOptionPane.showOptionDialog(null,input,
+				"HIGH SCORE", JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,null, button, button[0]);
+		if (result == 0){
+			String name = nameEntry.getText();
+			if (name.length() > 5)
+				name = name.substring(0,5);
+			
+			//Determine location of new high score relative to current high scores
+			boolean added = false;
+			for (int i = 0; i < highScores.size(); i++){
+				if (newScore > highScores.get(i)){
+					highScores.add(i, newScore);
+					highScoreNames.add(i, name);
+					added = true;
+					break;
+				}
+			}
+			if (!added){
+				highScores.add(newScore);
+				highScoreNames.add(name);
+			}
+			if (highScores.size() > 10){
+				highScores.remove(10);
+				highScoreNames.remove(10);
+			}
+		}
 	}
 	public void start(){
 		DisplayMode displayMode = new DisplayMode(100,100,16,75);
@@ -502,8 +586,9 @@ public class Asteroids{
 						p1Alive = false;
 						p1Model.resetToStart(!isSinglePlayer);
 					} else {
-						// TODO no lives remaining game over
+						addHighScore();
 						inMainMenu = true;
+						return;
 					}
 				}
 			}
@@ -517,7 +602,9 @@ public class Asteroids{
 							p2Alive = false;
 							p2Model.resetToStart(!isSinglePlayer);
 						} else {
+							addHighScore();
 							inMainMenu = true;
+							return;
 						}
 					}
 				}
@@ -610,7 +697,9 @@ public class Asteroids{
 					p1Alive = false;
 					p1Model.resetToStart(!isSinglePlayer);
 				} else {
+					addHighScore();
 					inMainMenu = true;
+					return;
 				}
 				continue;
 			}
@@ -626,7 +715,9 @@ public class Asteroids{
 						p2Alive = false;
 						p2Model.resetToStart(!isSinglePlayer);
 					} else {
+						addHighScore();
 						inMainMenu = true;
+						return;
 					}
 					continue;
 				}
@@ -1048,7 +1139,7 @@ public class Asteroids{
 			}else{
 				for (int i = 0; i < highScores.size();i++){
 					g.drawString(""+(i+1)+") "+highScoreNames.get(i), getWidth()/4, 200+60*i);
-					g.drawString(""+highScoreNames.get(i), getWidth()*3/4, 200+60*i);
+					g.drawString(""+highScores.get(i), getWidth()*3/4, 200+60*i);
 				}
 			}
 			if (highScoreTextArea.contains(MouseInfo.getPointerInfo().getLocation()))

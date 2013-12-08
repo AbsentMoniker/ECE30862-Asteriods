@@ -141,6 +141,8 @@ public class PlayerModel extends MovingObjectModel implements Updatable {
 	
 	@Override
 	public boolean decrementLives() {
+		if (lives == -1)
+			return true;
 		if (lives > 0) {
 			lives--;
 			return true;
