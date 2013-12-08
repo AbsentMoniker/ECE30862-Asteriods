@@ -5,3 +5,4 @@
 *.war
 *.ear
 Asteroids/bin/*
+Asteroids/scores.config

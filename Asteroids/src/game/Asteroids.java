@@ -109,8 +109,8 @@ public class Asteroids{
 				player2 = new Player(3*screenWidth/4, screenHeight/2, 0,0,0,0,3,1);
 			}
 		}
-		rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
-		alienShip = new AlienShip(600,600,0,0,0,0);
+		//rogueSpaceship = new RogueSpaceship(400,400,0,0,0,0);
+		//alienShip = new AlienShip(600,600,0,0,0,0);
 		initAsteroids();
 		bullets = new ArrayList<Bullet>();
 		paused = false;	
@@ -451,7 +451,7 @@ public class Asteroids{
 					}
 					canvas.update();
 					try{
-						Thread.sleep(10);
+						Thread.sleep(15);
 					}catch (InterruptedException ex){}
 				}
 			}
@@ -679,6 +679,12 @@ public class Asteroids{
 			player2.pause();
 		for (Asteroid asteroid: asteroids)
 			asteroid.pause();
+		for (Bullet bullet: bullets)
+			bullet.pause();
+		if (alienShip != null)
+			alienShip.pause();
+		if (rogueSpaceship != null)
+			rogueSpaceship.pause();
 	}
 	public static int getScreenWidth(){
 		return screenWidth;
@@ -1127,6 +1133,8 @@ public class Asteroids{
 					int returnVal = fc.showSaveDialog(this);
 					if (returnVal == JFileChooser.APPROVE_OPTION){
 						File saveFile = fc.getSelectedFile();
+						if (!saveFile.getAbsolutePath().endsWith(".asteroids"))
+							saveFile = new File(saveFile + ".asteroids");
 						saveGame(saveFile);
 					}
 				}else if (pauseTextAreas[2].contains(e.getLocationOnScreen())){//Open
@@ -1135,8 +1143,6 @@ public class Asteroids{
 					int returnVal = fc.showOpenDialog(this);
 					if (returnVal == JFileChooser.APPROVE_OPTION){
 						File openFile = fc.getSelectedFile();
-						if (!openFile.getAbsolutePath().endsWith(".asteroids"))
-							openFile = new File(openFile + ".asteroids");
 						gameInitFromFile(openFile);
 					}
 				}else if (pauseTextAreas[3].contains(e.getLocationOnScreen())){//Options
